@@ -9,6 +9,7 @@
     "lint-fix": "next lint --fix"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.3",
     "config": "^3.3.9",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -17,9 +18,13 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "next": "^13.2.4",
+    "next-redux-wrapper": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-papaparse": "^4.1.0"
+    "react-papaparse": "^4.1.0",
+    "react-redux": "^8.0.5",
+    "redux": "^4.2.1",
+    "redux-thunk": "^2.4.2"
   },
   "type": "module"
 }

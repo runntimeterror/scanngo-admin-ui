@@ -46,17 +46,6 @@ app.prepare().then(() => {
   // health endpoint
   // server.use('/health', health)
 
-  // infra registry heatlh backend
-  // server.use('/api/infra_registry_health', infraRegistryHealthRouter)
-
-  // feedback tool backend
-  // server.use('/api/feedback_tool', feedbackToolRouter)
-
-  // server.use('/api/cert_tool', certToolRouter)
-
-  // proxies to documentation
-  // server.use('/', proxyPagesRouter);
-
   // use nextjs handler for non proxied routes
   server.use('/', createUIRouter(nextjsUIHandle))
 
