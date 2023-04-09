@@ -4,8 +4,6 @@ import express from 'express'
 const router = express.Router()
 
 const createRouter = (uiRequestHandler) => {
-  // router.use('/feedback', ensureLoggedIn)
-
   router.use('/', (req, res) => {
     uiRequestHandler(req, res)
   })
