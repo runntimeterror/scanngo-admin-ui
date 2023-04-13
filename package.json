@@ -27,6 +27,11 @@
     "lint-fix": "next lint --fix"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@iconify/react": "^4.1.0",
+    "@mui/lab": "^5.0.0-alpha.126",
+    "@mui/material": "^5.12.0",
     "@reduxjs/toolkit": "^1.9.3",
     "config": "^3.3.9",
     "cookie-parser": "~1.4.4",
