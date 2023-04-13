@@ -57,10 +57,20 @@ function LoginPage() {
     setPassword(event.target.value);
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    console.log(`Username: ${username}\nPassword: ${password}`);
-    // TODO: submit form data to server for authentication
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const { token } = await response.json();
+      localStorage.setItem("token", token);
+      window.location.href = "/dashboard";
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -70,53 +80,55 @@ function LoginPage() {
       </StyledSection>
 
       <Container maxWidth="sm">
-        <StyledContent>
-          <Typography variant="h4" gutterBottom>
-            Sign in to Scan N Go!
-          </Typography>
+        <form onSubmit={handleSubmit}>
+          <StyledContent>
+            <Typography variant="h4" gutterBottom>
+              Sign in to Scan N Go!
+            </Typography>
 
-          <Stack sx={{ my: 2 }} spacing={3}>
-            <TextField
-              name="email"
-              label="Email address"
-              value={username}
-              onChange={handleUsernameChange}
-            />
+            <Stack sx={{ my: 2 }} spacing={3}>
+              <TextField
+                name="email"
+                label="Email address"
+                value={username}
+                onChange={handleUsernameChange}
+              />
 
-            <TextField
-              name="password"
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={handlePasswordChange}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      <Iconify
-                        icon={
-                          showPassword ? "eva:eye-fill" : "eva:eye-off-fill"
-                        }
-                      />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Stack>
+              <TextField
+                name="password"
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={handlePasswordChange}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        <Iconify
+                          icon={
+                            showPassword ? "eva:eye-fill" : "eva:eye-off-fill"
+                          }
+                        />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Stack>
 
-          <LoadingButton
-            fullWidth
-            size="large"
-            type="submit"
-            variant="contained"
-          >
-            Login
-          </LoadingButton>
-        </StyledContent>
+            <LoadingButton
+              fullWidth
+              size="large"
+              type="submit"
+              variant="contained"
+            >
+              Login
+            </LoadingButton>
+          </StyledContent>
+        </form>
       </Container>
     </StyledRoot>
   );
