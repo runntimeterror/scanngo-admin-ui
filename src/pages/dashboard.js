@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import jwt from 'jsonwebtoken'
 
 function DashboardPage() {
     const [username, setUsername] = useState('');
@@ -7,7 +8,7 @@ function DashboardPage() {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+          const decodedToken = jwt.decode(token);
           setUsername(decodedToken.username);
         } catch (error) {
           console.error(error);
