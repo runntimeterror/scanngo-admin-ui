@@ -14,7 +14,7 @@ export default function Home() {
           // if store manager, set client id cookie and send to client dashboard
         } else if (decodedToken.accessLevel === 1) {
           // if admin, send to admin dashboard
-          window.location.href = "/dashboard/admin";
+          window.location.href = "/admin/dashboard";
         }
       } catch (error) {
         console.error(error);
