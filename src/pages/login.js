@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import {
   Container,
@@ -8,6 +8,8 @@ import {
   InputAdornment,
   TextField,
   useMediaQuery,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import Iconify from "../components/iconify";
@@ -48,7 +50,8 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
   function handleUsernameChange(event) {
     setUsername(event.target.value);
   }
@@ -65,72 +68,89 @@ function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      const { token } = await response.json();
-      localStorage.setItem("token", token);
-      window.location.href = "/dashboard";
+      if (response.status === 200) {
+        const { token } = await response.json();
+        localStorage.setItem("token", token);
+        window.location.href = "/";
+        return;
+      }
+      setOpen(true);
     } catch (error) {
       console.error(error);
+      setOpen(true);
     }
   }
 
   return (
-    <StyledRoot>
-      <StyledSection>
-        <img src="/assets/scan-n-go.png" alt="login" />
-      </StyledSection>
+    <>
+      <StyledRoot>
+        <StyledSection>
+          <img src="/assets/scan-n-go.png" alt="login" />
+        </StyledSection>
 
-      <Container maxWidth="sm">
-        <form onSubmit={handleSubmit}>
-          <StyledContent>
-            <Typography variant="h4" gutterBottom>
-              Sign in to Scan N Go!
-            </Typography>
+        <Container maxWidth="sm">
+          <form onSubmit={handleSubmit}>
+            <StyledContent>
+              <Typography variant="h4" gutterBottom>
+                Sign in to Scan N Go!
+              </Typography>
 
-            <Stack sx={{ my: 2 }} spacing={3}>
-              <TextField
-                name="email"
-                label="Email address"
-                value={username}
-                onChange={handleUsernameChange}
-              />
+              <Stack sx={{ my: 2 }} spacing={3}>
+                <TextField
+                  name="email"
+                  label="Email address"
+                  value={username}
+                  onChange={handleUsernameChange}
+                />
 
-              <TextField
-                name="password"
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={handlePasswordChange}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
-                        <Iconify
-                          icon={
-                            showPassword ? "eva:eye-fill" : "eva:eye-off-fill"
-                          }
-                        />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Stack>
+                <TextField
+                  name="password"
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={handlePasswordChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          <Iconify
+                            icon={
+                              showPassword ? "eva:eye-fill" : "eva:eye-off-fill"
+                            }
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Stack>
 
-            <LoadingButton
-              fullWidth
-              size="large"
-              type="submit"
-              variant="contained"
-            >
-              Login
-            </LoadingButton>
-          </StyledContent>
-        </form>
-      </Container>
-    </StyledRoot>
+              <LoadingButton
+                fullWidth
+                size="large"
+                type="submit"
+                variant="contained"
+              >
+                Login
+              </LoadingButton>
+            </StyledContent>
+          </form>
+        </Container>
+      </StyledRoot>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert
+          elevation={6}
+          variant="filled"
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Invalid credentials.
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 
