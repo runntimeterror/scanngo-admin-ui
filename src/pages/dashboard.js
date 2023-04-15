@@ -14,12 +14,15 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 
 const DASHBOARD_SECTIONS = {
   OVERVIEW: { label: `Overview`, requiresAdmin: false },
@@ -30,11 +33,20 @@ const DASHBOARD_SECTIONS = {
 
 function Dashboard(props) {
   const [username, setUsername] = useState("");
-  const [open, setOpen] = useState("Dashboard");
+  const [open, setOpen] = useState("Overview");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accessLevel, setAccessLevel] = useState(0);
   const drawerWidth = 240;
   const { window } = props;
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -84,14 +96,14 @@ function Dashboard(props) {
       <Divider />
       <List>
         {Object.keys(DASHBOARD_SECTIONS).map((key) => {
-          const section = DASHBOARD_SECTIONS[key]
+          const section = DASHBOARD_SECTIONS[key];
           if (
             (section.requiresAdmin && accessLevel == 1) ||
             !section.requiresAdmin
           )
             return (
               <ListItem key={section.label} disablePadding>
-                <ListItemButton>
+                <ListItemButton onClick={() => setOpen(section.label)}>
                   <ListItemIcon>{sectionIcon(section.label)}</ListItemIcon>
                   <ListItemText primary={section.label} />
                 </ListItemButton>
@@ -112,7 +124,7 @@ function Dashboard(props) {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -123,8 +135,35 @@ function Dashboard(props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Responsive drawer
+            {open}
           </Typography>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            color="inherit"
+          >
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <Box
@@ -170,6 +209,7 @@ function Dashboard(props) {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
+          minHeight: `100vh`,
         }}
       >
         <Toolbar />
