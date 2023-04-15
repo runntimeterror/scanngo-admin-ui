@@ -9,13 +9,7 @@ export default function Home() {
     if (token) {
       try {
         const decodedToken = jwt.decode(token);
-        // check user level.
-        if (decodedToken.accessLevel === 2) {
-          // if store manager, set client id cookie and send to client dashboard
-        } else if (decodedToken.accessLevel === 1) {
-          // if admin, send to admin dashboard
-          window.location.href = "/admin/dashboard";
-        }
+        window.location.href = "/dashboard";
       } catch (error) {
         console.error(error);
         localStorage.removeItem("token");
