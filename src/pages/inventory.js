@@ -12,9 +12,11 @@ const App = () => {
     // Each Column Definition results in one Column.
     const [columnDefs, setColumnDefs] = useState([
         { field: 'productId', filter: true, type: 'numericColumn', valueParser: params => Number(params.newValue) },
+        { field: 'inventoryProductId', filter: true, type: 'numericColumn', valueParser: params => Number(params.newValue) },
         { field: 'name', filter: true },
         { field: 'imageUrl', filter: true },
         { field: 'price', valueParser: params => Number(params.newValue) },
+        { field: 'qty', filter: true, type: 'numericColumn', valueParser: params => Number(params.newValue) },
         { field: 'barcode', filter: true, type: 'numericColumn' },
         { field: 'programCategory', filter: true },
         { field: 'productType', filter: true },
@@ -50,7 +52,7 @@ const App = () => {
 
     // Example load data from server
     useEffect(() => {
-        fetch(host + '/product', config)
+        fetch(host + '/inventory', config)
             .then(result => result.json())
             .then(rowData => setRowData(rowData))
     }, []);
@@ -86,7 +88,7 @@ const App = () => {
             //headers: { 'Content-Type': 'application/json' },
             body: jsonStr
         };
-        fetch(host + '/product/' + data.productId, requestOptions)
+        fetch(host + '/inventory/' + data.productId, requestOptions)
             .then(response => response.json())
             .then(data => console.log('PUT response: ' + JSON.stringify(data)))
         //.then(data => this.setState({ postId: data.id }));
