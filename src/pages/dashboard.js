@@ -21,9 +21,16 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 
+const DASHBOARD_SECTIONS = {
+  OVERVIEW: { label: `Overview`, requiresAdmin: false },
+  CLIENT: { label: `Client`, requiresAdmin: true },
+  INVENTORY: { label: `Inventory`, requiresAdmin: false },
+  PRODUCT: { label: `Product`, requiresAdmin: false },
+};
+
 function Dashboard(props) {
   const [username, setUsername] = useState("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState("Dashboard");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accessLevel, setAccessLevel] = useState(0);
   const drawerWidth = 240;
@@ -51,10 +58,24 @@ function Dashboard(props) {
     window.location.href = "/login";
   }
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const sectionIcon = (section) => {
+    switch (section) {
+      case DASHBOARD_SECTIONS.OVERVIEW.label:
+        return <SpaceDashboardIcon />;
+      case DASHBOARD_SECTIONS.CLIENT.label:
+        return <AccountBoxIcon />;
+      case DASHBOARD_SECTIONS.INVENTORY.label:
+        return <InventoryIcon />;
+      case DASHBOARD_SECTIONS.PRODUCT.label:
+        return <ShoppingCartCheckoutIcon />;
+    }
   };
 
   const drawer = (
@@ -62,40 +83,21 @@ function Dashboard(props) {
       <Toolbar />
       <Divider />
       <List>
-        <ListItem key={"Overview"} disablePadding>
-          <ListItemButton>
-            <ListItemIcon>
-              <SpaceDashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Overview"} />
-          </ListItemButton>
-        </ListItem>
-        {accessLevel == 1 ? (
-          <ListItem key={"Clients"} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <AccountBoxIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Clients"} />
-            </ListItemButton>
-          </ListItem>
-        ) : null}
-        <ListItem key={"Inventory"} disablePadding>
-          <ListItemButton>
-            <ListItemIcon>
-              <InventoryIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Inventory"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem key={"Products"} disablePadding>
-          <ListItemButton>
-            <ListItemIcon>
-              <ShoppingCartCheckoutIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Products"} />
-          </ListItemButton>
-        </ListItem>
+        {Object.keys(DASHBOARD_SECTIONS).map((key) => {
+          const section = DASHBOARD_SECTIONS[key]
+          if (
+            (section.requiresAdmin && accessLevel == 1) ||
+            !section.requiresAdmin
+          )
+            return (
+              <ListItem key={section.label} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>{sectionIcon(section.label)}</ListItemIcon>
+                  <ListItemText primary={section.label} />
+                </ListItemButton>
+              </ListItem>
+            );
+        })}
       </List>
     </div>
   );
@@ -139,8 +141,11 @@ function Dashboard(props) {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
