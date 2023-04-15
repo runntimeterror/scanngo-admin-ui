@@ -1,12 +1,35 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import { API_DOMAIN } from "../../../utils";
 
 async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
   const { username, password } = req.body;
+  const loginPayload = { email: username, password };
+  const resp = await fetch(`${API_DOMAIN}/user/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(loginPayload),
+  });
+  if (resp.status === 200) {
+    const user = await resp.json();
+    const token = jwt.sign(
+      { username: user.username, accessLevel: user.accessLevel },
+      process.env.REACT_APP_JWT_SECRET,
+      {
+        expiresIn: "24h",
+      }
+    );
+
+    return res.status(200).json({ token });
+  }
+  return res.status(401).json({ message: "Invalid credentials" });
+  
+  /*
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
   // TODO: replace this with a call to a database
@@ -15,12 +38,7 @@ async function handler(req, res) {
   if (!user || !(await bcrypt.compare(password, user.hashedPassword))) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
-
-  const token = jwt.sign({ username: user.username }, process.env.REACT_APP_JWT_SECRET, {
-    expiresIn: '1h',
-  });
-
-  return res.status(200).json({ token });
+  */
 }
 
 export default handler;
