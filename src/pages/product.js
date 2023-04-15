@@ -45,8 +45,9 @@ const App = () => {
         //mode: 'cors'
     };
 
-    const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
+    //const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
     //const host = 'http://scanngo-api-alb-1470236169.us-west-2.elb.amazonaws.com'
+    const host = 'http://localhost:8081'
 
     // Example load data from server
     useEffect(() => {

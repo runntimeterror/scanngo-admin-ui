@@ -47,8 +47,9 @@ const App = () => {
         //mode: 'cors'
     };
 
-    const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
+    //const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
     //const host = 'http://scanngo-api-alb-1470236169.us-west-2.elb.amazonaws.com'
+    const host = 'http://localhost:8081'
 
     // Example load data from server
     useEffect(() => {
@@ -70,6 +71,31 @@ const App = () => {
         gridRef.current.api.applyTransaction({ add: [{}] });
     }, []);
 
+    const onRemoveSelected = useCallback(() => {
+        const rows = gridRef.current.api.getSelectedRows();
+        for (let row of rows) {
+            const jsonStr = JSON.stringify(row)
+            console.debug(
+                'onRemoveSelected: (' + jsonStr + ')'
+            );
+            const requestOptions = {
+                method: 'DELETE',
+                headers: headers,
+                body: jsonStr
+            };
+            try {
+                fetch(host + '/inventory/' + row.inventoryProductId, requestOptions)
+                    .then(response => response.json())
+                    .then(data => console.log('DELETE response: ' + JSON.stringify(data)))
+                    .then(data => gridRef.current.api.applyTransaction({ remove: row }))
+                    .catch(error => console.error(error));
+            }
+            catch (e) {
+                console.error(e)
+            }
+        }
+    }, []);
+
     const onCellValueChanged = useCallback((event) => {
         console.debug(
             'onCellValueChanged: ' + event.colDef.field + ' = ' + event.newValue
@@ -88,7 +114,7 @@ const App = () => {
             //headers: { 'Content-Type': 'application/json' },
             body: jsonStr
         };
-        fetch(host + '/inventory/' + data.productId, requestOptions)
+        fetch(host + '/inventory/' + data.inventoryProductId, requestOptions)
             .then(response => response.json())
             .then(data => console.log('PUT response: ' + JSON.stringify(data)))
         //.then(data => this.setState({ postId: data.id }));
@@ -100,6 +126,7 @@ const App = () => {
             {/* Example using Grid's API */}
             <button onClick={buttonListener}>Deselect All</button>
             <button onClick={insertButtonListener}>New Row</button>
+            <button onClick={onRemoveSelected}>Remove Selected</button>
 
             {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
             {/* <div className="ag-theme-alpine" style={{ width: 500, height: 500 }}> */}
