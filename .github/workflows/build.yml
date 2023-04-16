@@ -1,4 +1,4 @@
-name: ScanNgo-api-build-deploy-pipeline
+name: ScanNgo-admin-ui-build-deploy-pipeline
 
 on:
   release:
@@ -13,7 +13,7 @@ jobs:
     - name: Create config file
       run: |
         touch .env
-        echo "REACT_APP_JWT_SECRET=${{ jwt_secret }}" >> .env
+        echo "REACT_APP_JWT_SECRET=${{ secrets.jwt_secret }}" >> .env
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
