@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Grid, Card, Typography, CardContent, Box } from "@mui/material";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import PeopleIcon from "@mui/icons-material/People";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import { GRADIENTS } from "../color-utils/gradients";
+import dynamic from "next/dynamic";
+
+const Chart = dynamic(() => import("react-charts").then((mod) => mod.Chart), {
+  ssr: false,
+});
 
 const formatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -36,6 +41,42 @@ const chartCardHeaderStyle = {
 };
 
 function Overview(props) {
+  const bardata = [
+    { primary: `M`, secondary: Math.random() },
+    { primary: `T`, secondary: Math.random() },
+    { primary: `W`, secondary: Math.random() },
+    { primary: `T`, secondary: Math.random() },
+    { primary: `F`, secondary: Math.random() },
+    { primary: `S`, secondary: Math.random() },
+    { primary: `S`, secondary: Math.random() },
+  ];
+
+  const linedata = [
+    { primary: 0, secondary: Math.random() },
+    { primary: 1, secondary: Math.random() },
+    { primary: 2, secondary: Math.random() },
+    { primary: 3, secondary: Math.random() },
+    { primary: 4, secondary: Math.random() },
+    { primary: 5, secondary: Math.random() },
+    { primary: 6, secondary: Math.random() },
+  ];
+  const primaryAxis = useMemo(
+    () => ({
+      getValue: (datum) => datum.primary,
+    }),
+    [bardata]
+  );
+
+  const secondaryAxes = useMemo(
+    () => [
+      {
+        getValue: (datum) => datum.secondary,
+      },
+    ],
+    [bardata]
+  );
+
+
   return (
     <>
       <Grid container spacing={4}>
@@ -107,8 +148,12 @@ function Overview(props) {
           <Card>
             <CardContent sx={{ display: `grid` }}>
               <Box sx={chartCardHeaderStyle}>
-                <RemoveShoppingCartIcon
-                  sx={{ fontSize: `40px`, color: `white` }}
+                <Chart
+                  options={{
+                    data: [{ data: bardata, label: `Bar` }],
+                    primaryAxis: primaryAxis,
+                    secondaryAxes: secondaryAxes,
+                  }}
                 />
               </Box>
               <Typography sx={{ justifySelf: "end" }} variant="caption">
@@ -121,8 +166,12 @@ function Overview(props) {
           <Card>
             <CardContent sx={{ display: `grid` }}>
               <Box sx={chartCardHeaderStyle}>
-                <RemoveShoppingCartIcon
-                  sx={{ fontSize: `40px`, color: `white` }}
+                <Chart
+                  options={{
+                    data: [{ data: linedata, label: `Line` }],
+                    primaryAxis: primaryAxis,
+                    secondaryAxes: secondaryAxes,
+                  }}
                 />
               </Box>
               <Typography sx={{ justifySelf: "end" }} variant="caption">
