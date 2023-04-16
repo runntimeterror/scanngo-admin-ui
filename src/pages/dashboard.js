@@ -132,7 +132,13 @@ function Dashboard(props) {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            background: `linear-gradient(60deg, #3383FF, #176EF6)`,
+          }}
+        >
           <IconButton
             color="inherit"
             aria-label="open drawer"

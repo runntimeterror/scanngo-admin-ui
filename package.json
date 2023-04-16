@@ -48,6 +48,7 @@
     "next": "latest",
     "next-redux-wrapper": "^8.1.0",
     "react": "^18.2.0",
+    "react-charts": "^3.0.0-beta.54",
     "react-csv-importer": "^0.8.0",
     "react-dom": "^18.2.0",
     "react-papaparse": "^4.1.0",
