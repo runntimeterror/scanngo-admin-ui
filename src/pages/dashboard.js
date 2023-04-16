@@ -23,7 +23,7 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import Overview from "@/components/dashboard/overview";
+import Overview from "../components/dashboard/overview";
 
 const DASHBOARD_SECTIONS = {
   OVERVIEW: { label: `Overview`, requiresAdmin: false },

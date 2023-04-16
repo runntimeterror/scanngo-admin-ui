@@ -1,5 +1,5 @@
-import "@/styles/globals.css";
-import "@/styles/react-csv.css";
+import "../styles/globals.css";
+import "../styles/react-csv.css";
 
 export default function App({ Component, pageProps }) {
   return (
