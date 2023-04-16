@@ -22,8 +22,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "NODE_ENV=production node src/server/server.js",
-    "dev": "NODE_CONFIG_ENV=local node src/server/server.js",
+    "start": "next start",
+    "dev": "next dev",
     "build": "next build",
     "lint-fix": "next lint --fix"
   },
@@ -46,7 +46,7 @@
     "jade": "~1.11.0",
     "jsonwebtoken": "^9.0.0",
     "morgan": "~1.9.1",
-    "next": "^13.2.4",
+    "next": "latest",
     "next-redux-wrapper": "^8.1.0",
     "react": "^18.2.0",
     "react-csv-importer": "^0.8.0",
