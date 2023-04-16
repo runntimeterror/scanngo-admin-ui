@@ -8,6 +8,7 @@ const App = () => {
 
     const gridRef = useRef(); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
+    const [firstRender, setFirstRender] = useState(false);
 
     // Each Column Definition results in one Column.
     const [columnDefs, setColumnDefs] = useState([
@@ -49,11 +50,20 @@ const App = () => {
     //const host = 'http://scanngo-api-alb-1470236169.us-west-2.elb.amazonaws.com'
     const host = 'http://localhost:8081'
 
-    // Example load data from server
-    useEffect(() => {
+    const loadData = () => {
         fetch(host + '/product', config)
             .then(result => result.json())
             .then(rowData => setRowData(rowData))
+    }
+    useEffect(() => {
+        if (!firstRender) {
+            loadData()
+            setFirstRender(true)
+        }
+    }, [firstRender]);
+
+    const refresh = useCallback(e => {
+        loadData()
     }, []);
 
     // Example using Grid's API
@@ -62,11 +72,35 @@ const App = () => {
     }, []);
 
     const insertButtonListener = useCallback(e => {
-        // const newRow = {}
-        // rowData.push(newRow)
-        //setRowData(rowData)
-        // gridRef.current.api.setRowData(this.gridOptions.rowData)
-        gridRef.current.api.applyTransaction({ add: [{}] });
+        const newRow = {}
+        rowData.unshift(newRow)
+        setRowData(rowData)
+        gridRef.current.api.setRowData(rowData)
+        //gridRef.current.api.applyTransaction({ add: [{}] });
+    }, [rowData]);
+
+    const onRemoveSelected = useCallback(() => {
+        const rows = gridRef.current.api.getSelectedRows();
+        for (let row of rows) {
+            const jsonStr = JSON.stringify(row)
+            console.debug(
+                'onRemoveSelected: (' + jsonStr + ')'
+            );
+            const requestOptions = {
+                method: 'DELETE',
+                headers: headers,
+                body: jsonStr
+            };
+            try {
+                fetch(host + '/product/' + row.productId, requestOptions)
+                    .then(response => response.json())
+                    .then(data => console.log('DELETE response: ' + JSON.stringify(data)))
+                    .catch(error => console.error(error));
+            }
+            catch (e) {
+                console.error(e)
+            }
+        }
     }, []);
 
     const onCellValueChanged = useCallback((event) => {
@@ -99,6 +133,8 @@ const App = () => {
             {/* Example using Grid's API */}
             <button onClick={buttonListener}>Deselect All</button>
             <button onClick={insertButtonListener}>New Row</button>
+            <button onClick={onRemoveSelected}>Remove Selected</button>
+            <button onClick={refresh}>Refresh</button>
 
             {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
             {/* <div className="ag-theme-alpine" style={{ width: 500, height: 500 }}> */}
