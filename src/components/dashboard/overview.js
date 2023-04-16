@@ -1,84 +1,47 @@
 import React from "react";
-import {
-  GridContainer,
-  GridItem,
-  Card,
-  CardIcon,
-  CardHeader,
-} from "@mui/material";
+import { Grid, Card, CardActions, CardContent } from "@mui/material";
+
+const formatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
 
 function Overview(props) {
   return (
-    <GridContainer>
-      <GridItem xs={12} sm={6} md={3}>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6} md={3}>
         <Card>
-          <CardHeader color="warning" stats icon>
-            <CardIcon color="warning">
-              
-            </CardIcon>
-            <p className={classes.cardCategory}>Used Space</p>
-            <h3 className={classes.cardTitle}>
-              49/50 <small>GB</small>
-            </h3>
-          </CardHeader>
-          <CardFooter stats>
-            <div className={classes.stats}>
-              <Danger>
-                <Warning />
-              </Danger>
-              <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                Get more space
-              </a>
-            </div>
-          </CardFooter>
+          <CardContent>
+            <p>Total Sales</p>
+            <h3>{formatter.format(54292)}</h3>
+          </CardContent>
         </Card>
-      </GridItem>
-      <GridItem xs={12} sm={6} md={3}>
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
         <Card>
-          <CardHeader color="dark" stats icon>
-            <CardIcon color="dark">
-             
-            </CardIcon>
-            <p className={classes.cardCategory}>Revenue</p>
-            <h3 className={classes.cardTitle}>$34,245</h3>
-          </CardHeader>
-          <CardFooter stats>
-            <div className={classes.stats}>
-
-              Last 24 Hours
-            </div>
-          </CardFooter>
+          <CardContent>
+            <p>Transactions</p>
+            <h3>2342</h3>
+          </CardContent>
         </Card>
-      </GridItem>
-      <GridItem xs={12} sm={6} md={3}>
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
         <Card>
-          <CardHeader color="danger" stats icon>
-            <CardIcon color="danger">
-              
-            </CardIcon>
-            <p className={classes.cardCategory}>Fixed Issues</p>
-            <h3 className={classes.cardTitle}>75</h3>
-          </CardHeader>
+          <CardContent>
+            <p>Customers</p>
+            <h3>523</h3>
+          </CardContent>
         </Card>
-      </GridItem>
-      <GridItem xs={12} sm={6} md={3}>
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
         <Card>
-          <CardHeader color="info" stats icon>
-            <CardIcon color="info">
-             
-            </CardIcon>
-            <p className={classes.cardCategory}>Followers</p>
-            <h3 className={classes.cardTitle}>+245</h3>
-          </CardHeader>
-          <CardFooter stats>
-            <div className={classes.stats}>
-              <Update />
-              Just Updated
-            </div>
-          </CardFooter>
+          <CardContent>
+            <p>In Store / Online</p>
+            <h3>245 / 278</h3>
+          </CardContent>
         </Card>
-      </GridItem>
-    </GridContainer>
+      </Grid>
+    </Grid>
   );
 }
 
