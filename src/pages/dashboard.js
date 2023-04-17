@@ -24,6 +24,8 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Overview from "../components/dashboard/overview";
+import Client from "../components/dashboard/client";
+import Inventory from "../components/dashboard/inventory";
 
 const DASHBOARD_SECTIONS = {
   OVERVIEW: { label: `Overview`, requiresAdmin: false },
@@ -97,6 +99,10 @@ function Dashboard(props) {
     switch (section) {
       case DASHBOARD_SECTIONS.OVERVIEW.label:
         return <Overview />;
+      case DASHBOARD_SECTIONS.CLIENT.label:
+        return <Client />;
+      case DASHBOARD_SECTIONS.INVENTORY.label:
+        return <Inventory />;
     }
   };
 
