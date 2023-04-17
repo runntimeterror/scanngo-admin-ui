@@ -38,7 +38,8 @@ const App = () => {
 
     const headers = new Headers({
         "Client-Id": "d4952489-d57c-11ed-ab65-062dad11b3d9",
-        "Session-Id": "d4952489-d57c-11ed-ab65-062dad11b3d9"
+        "Session-Id": "d4952489-d57c-11ed-ab65-062dad11b3d9",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2ODE2MDA0NzEsImV4cCI6MTcxMzEzNjQ3MSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoiYXNkYXNkIiwiYWNjZXNzTGV2ZWwiOiIxIn0.teOTq_cdmCNlRuJ0tl88ffYdzGVLxv-sO6o47jydZc4"
     });
 
     const config = {
@@ -47,9 +48,11 @@ const App = () => {
         //mode: 'cors'
     };
 
-    //const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
     //const host = 'http://scanngo-api-alb-1470236169.us-west-2.elb.amazonaws.com'
-    const host = 'http://localhost:8081'
+    //const host = 'http://localhost:8081'
+    //const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
+    const host = 'https://api.scanngo.link'
+    //const host = '/api'
 
     // Example load data from server
     useEffect(() => {
@@ -64,12 +67,11 @@ const App = () => {
     }, []);
 
     const insertButtonListener = useCallback(e => {
-        // const newRow = {}
-        // rowData.push(newRow)
-        //setRowData(rowData)
-        // gridRef.current.api.setRowData(this.gridOptions.rowData)
-        gridRef.current.api.applyTransaction({ add: [{}] });
-    }, []);
+        const newRow = { inventoryProductId: null }
+        rowData.unshift(newRow)
+        setRowData(rowData)
+        gridRef.current.api.setRowData(rowData)
+    }, [rowData]);
 
     const onRemoveSelected = useCallback(() => {
         const rows = gridRef.current.api.getSelectedRows();
@@ -104,20 +106,30 @@ const App = () => {
 
     const onRowValueChanged = useCallback((event) => {
         var data = event.data;
-        const jsonStr = JSON.stringify(data)
-        console.debug(
-            'onRowValueChanged: (' + jsonStr + ')'
-        );
-        const requestOptions = {
-            method: 'PUT',
-            headers: headers,
-            //headers: { 'Content-Type': 'application/json' },
-            body: jsonStr
-        };
-        fetch(host + '/inventory/' + data.inventoryProductId, requestOptions)
-            .then(response => response.json())
-            .then(data => console.log('PUT response: ' + JSON.stringify(data)))
-        //.then(data => this.setState({ postId: data.id }));
+        if (data.inventoryProductId) {
+            const jsonStr = JSON.stringify([data])
+            const requestOptions = {
+                method: 'PUT',
+                headers: headers,
+                body: jsonStr
+            };
+            fetch(host + '/inventory', requestOptions)
+                .then(response => response.json())
+                .then(data => console.log('PUT response: ' + JSON.stringify(data)))
+        } else {
+            delete data.inventoryProductId
+            const jsonStr = JSON.stringify([data])
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: jsonStr
+            };
+            fetch(host + '/inventory', requestOptions)
+                .then(response => response.json())
+                .then(data => console.log('POST response: ' + JSON.stringify(data)))
+                .then(data => gridRef.current.api.applyTransaction({ update: data }))
+                .catch(error => console.error(error));
+        }
     }, []);
 
     return (
