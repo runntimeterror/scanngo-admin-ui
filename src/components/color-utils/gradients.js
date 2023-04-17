@@ -4,6 +4,7 @@ export const GRADIENTS = {
   BLACK: `linear-gradient(60deg, #263238, #212121)`,
   RED: `linear-gradient(60deg, #ef5350, #e53935)`,
   BLUE: `linear-gradient(60deg, #26c6da, #00acc1)`,
+  LIGHT_BLUE: `linear-gradient(60deg, #BAD4FD, #ADCDFF)`
 };
 
 export function pickRandomGradient() {

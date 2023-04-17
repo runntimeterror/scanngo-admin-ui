@@ -18,10 +18,10 @@ async function handler(req, res) {
   if (resp.status === 200) {
     const user = await resp.json();
     const token = jwt.sign(
-      { username: user.username, accessLevel: user.accessLevel },
+      { username: user.username, accessLevel: user.accessLevel.toString() },
       process.env.REACT_APP_JWT_SECRET,
       {
-        expiresIn: "24h",
+        expiresIn: "1y",
       }
     );
 
