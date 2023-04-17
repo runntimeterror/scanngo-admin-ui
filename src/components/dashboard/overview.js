@@ -6,7 +6,12 @@ import PeopleIcon from "@mui/icons-material/People";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import { GRADIENTS } from "../color-utils/gradients";
 import dynamic from "next/dynamic";
-import { processAggregates } from "../../utils/overview-data-helper";
+import {
+  processAggregates,
+  processSaleDayOfWeek,
+  processSalesCountByDays,
+  processAverageOrderValueByDays,
+} from "../../utils/overview-data-helper";
 
 const Chart = dynamic(() => import("react-charts").then((mod) => mod.Chart), {
   ssr: false,
@@ -32,7 +37,7 @@ const aggrCardHeaderStyle = {
 
 const chartCardHeaderStyle = {
   width: `100%`,
-  height: `160px`,
+  height: `200px`,
   background: GRADIENTS.LIGHT_BLUE,
   boxShadow: `0 4px 20px 0 rgba(0, 0, 0,.14), 0 7px 10px -5px rgba(255, 152, 0,.4)`,
   borderRadius: `3px`,
@@ -42,31 +47,16 @@ const chartCardHeaderStyle = {
 };
 
 function Overview() {
-  const [overviewData, setOverviewData] = useState({});
-  const bardata = [
-    { primary: `M`, secondary: Math.random() },
-    { primary: `T`, secondary: Math.random() },
-    { primary: `W`, secondary: Math.random() },
-    { primary: `T`, secondary: Math.random() },
-    { primary: `F`, secondary: Math.random() },
-    { primary: `S`, secondary: Math.random() },
-    { primary: `S`, secondary: Math.random() },
-  ];
+  const [aggregateData, setAggregateData] = useState({});
+  const [saleByDayData, setSaleByDayData] = useState();
+  const [saleCountByDateData, setSaleCountByDateData] = useState();
+  const [averageOrderValueData, setAverageOrderValueData] = useState();
 
-  const linedata = [
-    { primary: 0, secondary: Math.random() },
-    { primary: 1, secondary: Math.random() },
-    { primary: 2, secondary: Math.random() },
-    { primary: 3, secondary: Math.random() },
-    { primary: 4, secondary: Math.random() },
-    { primary: 5, secondary: Math.random() },
-    { primary: 6, secondary: Math.random() },
-  ];
   const primaryAxis = useMemo(
     () => ({
       getValue: (datum) => datum.primary,
     }),
-    [bardata]
+    []
   );
 
   const secondaryAxes = useMemo(
@@ -75,7 +65,7 @@ function Overview() {
         getValue: (datum) => datum.secondary,
       },
     ],
-    [bardata]
+    []
   );
 
   useEffect(() => {
@@ -88,10 +78,19 @@ function Overview() {
         },
         body: JSON.stringify({ token }),
       });
-      const overviewData = await resp.json();
+      const serviceRespJson = await resp.json();
       //process data
-      const aggregateData = processAggregates(overviewData);
-      setOverviewData(aggregateData);
+      const aggregateData = processAggregates(serviceRespJson);
+      setAggregateData(aggregateData);
+
+      const sbd = processSaleDayOfWeek(serviceRespJson);
+      setSaleByDayData(sbd);
+
+      const scbd = processSalesCountByDays(serviceRespJson);
+      setSaleCountByDateData(scbd);
+
+      const aovd = processAverageOrderValueByDays(serviceRespJson);
+      setAverageOrderValueData(aovd);
     };
     fetchData();
   }, []);
@@ -109,7 +108,7 @@ function Overview() {
                 Total Sales
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {formatter.format(overviewData.totalSales)}
+                {formatter.format(aggregateData.totalSales)}
               </Typography>
             </CardContent>
           </Card>
@@ -124,7 +123,7 @@ function Overview() {
                 Transactions
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {overviewData.totalOrder}
+                {aggregateData.totalOrder}
               </Typography>
             </CardContent>
           </Card>
@@ -139,7 +138,7 @@ function Overview() {
                 Customers
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {overviewData.totalCustomers}
+                {aggregateData.totalCustomers}
               </Typography>
             </CardContent>
           </Card>
@@ -156,7 +155,7 @@ function Overview() {
                 Abandoned Cart
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {overviewData.totalAbandonedCart}
+                {aggregateData.totalAbandonedCart}
               </Typography>
             </CardContent>
           </Card>
@@ -167,13 +166,15 @@ function Overview() {
           <Card>
             <CardContent sx={{ display: `grid` }}>
               <Box sx={chartCardHeaderStyle}>
-                <Chart
-                  options={{
-                    data: [{ data: bardata, label: `Bar` }],
-                    primaryAxis: primaryAxis,
-                    secondaryAxes: secondaryAxes,
-                  }}
-                />
+                {!!saleByDayData && (
+                  <Chart
+                    options={{
+                      data: [...saleByDayData],
+                      primaryAxis,
+                      secondaryAxes,
+                    }}
+                  />
+                )}
               </Box>
               <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Sales by Day of Week
@@ -185,13 +186,15 @@ function Overview() {
           <Card>
             <CardContent sx={{ display: `grid` }}>
               <Box sx={chartCardHeaderStyle}>
-                <Chart
-                  options={{
-                    data: [{ data: linedata, label: `Line` }],
-                    primaryAxis: primaryAxis,
-                    secondaryAxes: secondaryAxes,
-                  }}
-                />
+                {!!saleCountByDateData && (
+                  <Chart
+                    options={{
+                      data: [...saleCountByDateData],
+                      primaryAxis: primaryAxis,
+                      secondaryAxes: secondaryAxes,
+                    }}
+                  />
+                )}
               </Box>
               <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Sales Trend (over time)
@@ -203,9 +206,15 @@ function Overview() {
           <Card>
             <CardContent sx={{ display: `grid` }}>
               <Box sx={chartCardHeaderStyle}>
-                <RemoveShoppingCartIcon
-                  sx={{ fontSize: `40px`, color: `white` }}
-                />
+                {!!averageOrderValueData && (
+                  <Chart
+                    options={{
+                      data: [...averageOrderValueData],
+                      primaryAxis: primaryAxis,
+                      secondaryAxes: secondaryAxes,
+                    }}
+                  />
+                )}
               </Box>
               <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Average Order Value (over time)

@@ -29,7 +29,7 @@ const processSaleDayOfWeek = (serviceResp) => {
     const client = serviceResp[clientId];
     const obj = client.salesValueByWeekDays;
     const data = daysOfWeek
-      .map((day) => ({ primary: day, secondary: obj[day]/100 }))
+      .map((day) => ({ primary: day, secondary: Math.ceil(obj[day]) }))
       .sort(
         (a, b) => daysOfWeek.indexOf(a.primary) - daysOfWeek.indexOf(b.primary)
       );
@@ -39,4 +39,43 @@ const processSaleDayOfWeek = (serviceResp) => {
   return returnVal;
 };
 
-export { processAggregates, processSaleDayOfWeek };
+const readDateInPST = (dateString) => {
+  return new Date(dateString + "T00:00:00-08:00");
+};
+
+const processSalesCountByDays = (serviceResp) => {
+  const returnVal = [];
+  for (const clientId in serviceResp) {
+    const client = serviceResp[clientId];
+    const data = [];
+    for (const date in client.salesCountByDays) {
+      const dateInPST = readDateInPST(date);
+      const value = client.salesCountByDays[date];
+      data.push({ primary: dateInPST, secondary: value });
+    }
+    returnVal.push({ data, label: clientId });
+  }
+  return returnVal;
+};
+
+const processAverageOrderValueByDays = (serviceResp) => {
+  const returnVal = [];
+  for (const clientId in serviceResp) {
+    const client = serviceResp[clientId];
+    const data = [];
+    for (const date in client.averageOrderValuebyDate) {
+      const dateInPST = readDateInPST(date);
+      const value = client.averageOrderValuebyDate[date];
+      data.push({ primary: dateInPST, secondary: value });
+    }
+    returnVal.push({ data, label: clientId });
+  }
+  return returnVal;
+};
+
+export {
+  processAggregates,
+  processSaleDayOfWeek,
+  processSalesCountByDays,
+  processAverageOrderValueByDays,
+};
