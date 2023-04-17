@@ -6,7 +6,10 @@ import PeopleIcon from "@mui/icons-material/People";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import { GRADIENTS } from "../color-utils/gradients";
 import dynamic from "next/dynamic";
-import { processAggregates } from "../../utils/overview-data-helper";
+import {
+  processAggregates,
+  processSaleDayOfWeek,
+} from "../../utils/overview-data-helper";
 
 const Chart = dynamic(() => import("react-charts").then((mod) => mod.Chart), {
   ssr: false,
@@ -42,16 +45,8 @@ const chartCardHeaderStyle = {
 };
 
 function Overview() {
-  const [overviewData, setOverviewData] = useState({});
-  const bardata = [
-    { primary: `M`, secondary: Math.random() },
-    { primary: `T`, secondary: Math.random() },
-    { primary: `W`, secondary: Math.random() },
-    { primary: `T`, secondary: Math.random() },
-    { primary: `F`, secondary: Math.random() },
-    { primary: `S`, secondary: Math.random() },
-    { primary: `S`, secondary: Math.random() },
-  ];
+  const [aggregateData, setAggregateData] = useState({});
+  const [saleByDayData, setSaleByDayData] = useState();
 
   const linedata = [
     { primary: 0, secondary: Math.random() },
@@ -66,7 +61,7 @@ function Overview() {
     () => ({
       getValue: (datum) => datum.primary,
     }),
-    [bardata]
+    []
   );
 
   const secondaryAxes = useMemo(
@@ -75,7 +70,7 @@ function Overview() {
         getValue: (datum) => datum.secondary,
       },
     ],
-    [bardata]
+    []
   );
 
   useEffect(() => {
@@ -88,10 +83,13 @@ function Overview() {
         },
         body: JSON.stringify({ token }),
       });
-      const overviewData = await resp.json();
+      const serviceRespJson = await resp.json();
       //process data
-      const aggregateData = processAggregates(overviewData);
-      setOverviewData(aggregateData);
+      const aggregateData = processAggregates(serviceRespJson);
+      setAggregateData(aggregateData);
+
+      const sbd = processSaleDayOfWeek(serviceRespJson);
+      setSaleByDayData(sbd);
     };
     fetchData();
   }, []);
@@ -109,7 +107,7 @@ function Overview() {
                 Total Sales
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {formatter.format(overviewData.totalSales)}
+                {formatter.format(aggregateData.totalSales)}
               </Typography>
             </CardContent>
           </Card>
@@ -124,7 +122,7 @@ function Overview() {
                 Transactions
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {overviewData.totalOrder}
+                {aggregateData.totalOrder}
               </Typography>
             </CardContent>
           </Card>
@@ -139,7 +137,7 @@ function Overview() {
                 Customers
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {overviewData.totalCustomers}
+                {aggregateData.totalCustomers}
               </Typography>
             </CardContent>
           </Card>
@@ -156,7 +154,7 @@ function Overview() {
                 Abandoned Cart
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {overviewData.totalAbandonedCart}
+                {aggregateData.totalAbandonedCart}
               </Typography>
             </CardContent>
           </Card>
@@ -167,13 +165,15 @@ function Overview() {
           <Card>
             <CardContent sx={{ display: `grid` }}>
               <Box sx={chartCardHeaderStyle}>
-                <Chart
-                  options={{
-                    data: [{ data: bardata, label: `Bar` }],
-                    primaryAxis: primaryAxis,
-                    secondaryAxes: secondaryAxes,
-                  }}
-                />
+                {!!saleByDayData && (
+                  <Chart
+                    options={{
+                      data: [...saleByDayData],
+                      primaryAxis,
+                      secondaryAxes,
+                    }}
+                  />
+                )}
               </Box>
               <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Sales by Day of Week

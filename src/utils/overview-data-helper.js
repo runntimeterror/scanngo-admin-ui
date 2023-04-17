@@ -29,7 +29,7 @@ const processSaleDayOfWeek = (serviceResp) => {
     const client = serviceResp[clientId];
     const obj = client.salesValueByWeekDays;
     const data = daysOfWeek
-      .map((day) => ({ primary: day, secondary: obj[day]/100 }))
+      .map((day) => ({ primary: day, secondary: Math.ceil(obj[day]) }))
       .sort(
         (a, b) => daysOfWeek.indexOf(a.primary) - daysOfWeek.indexOf(b.primary)
       );
