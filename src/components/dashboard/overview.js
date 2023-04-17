@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { Grid, Card, Typography, CardContent, Box } from "@mui/material";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
@@ -32,7 +32,7 @@ const aggrCardHeaderStyle = {
 const chartCardHeaderStyle = {
   width: `100%`,
   height: `160px`,
-  background: GRADIENTS.GREEN,
+  background: GRADIENTS.LIGHT_BLUE,
   boxShadow: `0 4px 20px 0 rgba(0, 0, 0,.14), 0 7px 10px -5px rgba(255, 152, 0,.4)`,
   borderRadius: `3px`,
   display: `flex`,
@@ -76,6 +76,18 @@ function Overview(props) {
     [bardata]
   );
 
+  useEffect(async () => {
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/overview`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token }),
+    });
+    const overviewData = await resp.json();
+    debugger;
+  }, []);
 
   return (
     <>
@@ -86,7 +98,7 @@ function Overview(props) {
               <Box sx={aggrCardHeaderStyle}>
                 <AttachMoneyIcon sx={{ fontSize: `40px`, color: `white` }} />
               </Box>
-              <Typography sx={{ justifySelf: "end" }} variant="subtitle2">
+              <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Total Sales
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
@@ -101,7 +113,7 @@ function Overview(props) {
               <Box sx={aggrCardHeaderStyle}>
                 <ReceiptLongIcon sx={{ fontSize: `40px`, color: `white` }} />
               </Box>
-              <Typography sx={{ justifySelf: "end" }} variant="subtitle2">
+              <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Transactions
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
@@ -116,7 +128,7 @@ function Overview(props) {
               <Box sx={aggrCardHeaderStyle}>
                 <PeopleIcon sx={{ fontSize: `40px`, color: `white` }} />
               </Box>
-              <Typography sx={{ justifySelf: "end" }} variant="subtitle2">
+              <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Customers
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
@@ -133,7 +145,7 @@ function Overview(props) {
                   sx={{ fontSize: `40px`, color: `white` }}
                 />
               </Box>
-              <Typography sx={{ justifySelf: "end" }} variant="subtitle2">
+              <Typography sx={{ justifySelf: "end" }} variant="caption">
                 Abandoned Cart
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">

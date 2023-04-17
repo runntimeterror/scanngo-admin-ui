@@ -59,16 +59,18 @@ function Dashboard(props) {
       } catch (error) {
         console.error(error);
         localStorage.removeItem("token");
-        window.location.href = "/login";
+        document.location.href = "/login";
       }
     } else {
-      window.location.href = "/login";
+      document.location.href = "/login";
     }
   }, []);
 
   function handleLogout() {
     localStorage.removeItem("token");
-    window.location.href = "/login";
+    if (typeof document !== "undefined") {
+      document.location.href = "/login";
+    }
   }
 
   const container =
