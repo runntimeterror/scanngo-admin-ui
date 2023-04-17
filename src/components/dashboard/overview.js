@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { Grid, Card, Typography, CardContent, Box } from "@mui/material";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
@@ -6,6 +6,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import { GRADIENTS } from "../color-utils/gradients";
 import dynamic from "next/dynamic";
+import { processAggregates } from "../../utils/overview-data-helper";
 
 const Chart = dynamic(() => import("react-charts").then((mod) => mod.Chart), {
   ssr: false,
@@ -40,7 +41,8 @@ const chartCardHeaderStyle = {
   alignItems: `center`,
 };
 
-function Overview(props) {
+function Overview() {
+  const [overviewData, setOverviewData] = useState({});
   const bardata = [
     { primary: `M`, secondary: Math.random() },
     { primary: `T`, secondary: Math.random() },
@@ -76,17 +78,22 @@ function Overview(props) {
     [bardata]
   );
 
-  useEffect(async () => {
-    const token = localStorage.getItem("token");
-    const resp = await fetch(`/api/overview`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ token }),
-    });
-    const overviewData = await resp.json();
-    debugger;
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      const resp = await fetch(`/api/overview`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
+      const overviewData = await resp.json();
+      //process data
+      const aggregateData = processAggregates(overviewData);
+      setOverviewData(aggregateData);
+    };
+    fetchData();
   }, []);
 
   return (
@@ -102,7 +109,7 @@ function Overview(props) {
                 Total Sales
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                {formatter.format(54292)}
+                {formatter.format(overviewData.totalSales)}
               </Typography>
             </CardContent>
           </Card>
@@ -117,7 +124,7 @@ function Overview(props) {
                 Transactions
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                2342
+                {overviewData.totalOrder}
               </Typography>
             </CardContent>
           </Card>
@@ -132,7 +139,7 @@ function Overview(props) {
                 Customers
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                523
+                {overviewData.totalCustomers}
               </Typography>
             </CardContent>
           </Card>
@@ -149,7 +156,7 @@ function Overview(props) {
                 Abandoned Cart
               </Typography>
               <Typography sx={{ justifySelf: "end" }} variant="h6">
-                24
+                {overviewData.totalAbandonedCart}
               </Typography>
             </CardContent>
           </Card>
