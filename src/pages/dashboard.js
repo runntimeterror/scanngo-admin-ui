@@ -159,16 +159,22 @@ function Dashboard(props) {
           <Typography variant="h6" noWrap component="div">
             {open}
           </Typography>
-          <IconButton
-            size="large"
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={handleMenu}
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="subtitle2" noWrap component="div">
+              {username}
+            </Typography>
+
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </Box>
           <Menu
             id="menu-appbar"
             anchorEl={anchorEl}
