@@ -26,11 +26,14 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import Overview from "../components/dashboard/overview";
 import Client from "../components/dashboard/client";
 import Inventory from "../components/dashboard/inventory";
+import InventoryBulk from "../components/dashboard/inventoryBulk";
+import Product from "../components/dashboard/product";
 
 const DASHBOARD_SECTIONS = {
   OVERVIEW: { label: `Overview`, requiresAdmin: false },
   CLIENT: { label: `Client`, requiresAdmin: true },
   INVENTORY: { label: `Inventory`, requiresAdmin: false },
+  INVENTORY_BULK: { label: `Bulk upload`, requiresAdmin: false },
   PRODUCT: { label: `Product`, requiresAdmin: false },
 };
 
@@ -90,6 +93,8 @@ function Dashboard(props) {
         return <AccountBoxIcon />;
       case DASHBOARD_SECTIONS.INVENTORY.label:
         return <InventoryIcon />;
+      case DASHBOARD_SECTIONS.INVENTORY_BULK.label:
+        return <InventoryIcon />;
       case DASHBOARD_SECTIONS.PRODUCT.label:
         return <ShoppingCartCheckoutIcon />;
     }
@@ -103,7 +108,11 @@ function Dashboard(props) {
         return <Client />;
       case DASHBOARD_SECTIONS.INVENTORY.label:
         return <Inventory />;
-    }
+      case DASHBOARD_SECTIONS.INVENTORY_BULK.label:
+        return <InventoryBulk />;
+      case DASHBOARD_SECTIONS.PRODUCT.label:
+        return <Product />;
+      }
   };
 
   const drawer = (

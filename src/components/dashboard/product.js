@@ -4,7 +4,7 @@ import { AgGridReact } from 'ag-grid-react'; // the AG Grid React Component
 import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Optional theme CSS
 
-const App = () => {
+const Product = () => {
 
     const gridRef = useRef(); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
@@ -51,6 +51,7 @@ const App = () => {
     //const host = 'http://localhost:8081'
     //const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
     const host = 'https://api.scanngo.link'
+    //const host = '/api'
 
     const loadData = () => {
         fetch(host + '/product', config)
@@ -90,8 +91,7 @@ const App = () => {
             );
             const requestOptions = {
                 method: 'DELETE',
-                headers: headers,
-                body: jsonStr
+                headers: headers
             };
             try {
                 fetch(host + '/product/' + row.productId, requestOptions)
@@ -113,20 +113,30 @@ const App = () => {
 
     const onRowValueChanged = useCallback((event) => {
         var data = event.data;
-        const jsonStr = JSON.stringify(data)
-        console.debug(
-            'onRowValueChanged: (' + jsonStr + ')'
-        );
-        const requestOptions = {
-            method: 'PUT',
-            headers: headers,
-            //headers: { 'Content-Type': 'application/json' },
-            body: jsonStr
-        };
-        fetch(host + '/product/' + data.productId, requestOptions)
-            .then(response => response.json())
-            .then(data => console.log('PUT response: ' + JSON.stringify(data)))
-        //.then(data => this.setState({ postId: data.id }));
+        if (data.productId) {
+            const jsonStr = JSON.stringify([data])
+            const requestOptions = {
+                method: 'PUT',
+                headers: headers,
+                body: jsonStr
+            };
+            fetch(host + '/product', requestOptions)
+                .then(response => response.json())
+                .then(data => console.log('PUT response: ' + JSON.stringify(data)))
+        } else {
+            delete data.productId
+            const jsonStr = JSON.stringify([data])
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: jsonStr
+            };
+            fetch(host + '/product', requestOptions)
+                .then(response => response.json())
+                .then(data => console.log('POST response: ' + JSON.stringify(data)))
+                .then(data => gridRef.current.api.applyTransaction({ update: data }))
+                .catch(error => console.error(error));
+        }
     }, []);
 
     return (
@@ -163,4 +173,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default Product;
