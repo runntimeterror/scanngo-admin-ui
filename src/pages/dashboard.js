@@ -24,6 +24,8 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Overview from "../components/dashboard/overview";
+import Client from "../components/dashboard/client";
+import Inventory from "../components/dashboard/inventory";
 
 const DASHBOARD_SECTIONS = {
   OVERVIEW: { label: `Overview`, requiresAdmin: false },
@@ -97,6 +99,10 @@ function Dashboard(props) {
     switch (section) {
       case DASHBOARD_SECTIONS.OVERVIEW.label:
         return <Overview />;
+      case DASHBOARD_SECTIONS.CLIENT.label:
+        return <Client />;
+      case DASHBOARD_SECTIONS.INVENTORY.label:
+        return <Inventory />;
     }
   };
 
@@ -153,16 +159,22 @@ function Dashboard(props) {
           <Typography variant="h6" noWrap component="div">
             {open}
           </Typography>
-          <IconButton
-            size="large"
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={handleMenu}
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="subtitle2" noWrap component="div">
+              {username}
+            </Typography>
+
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </Box>
           <Menu
             id="menu-appbar"
             anchorEl={anchorEl}
