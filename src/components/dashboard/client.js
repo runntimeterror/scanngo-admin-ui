@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button, Box } from "@mui/material";
+import { Button, Box, Container } from "@mui/material";
 import ClientQRCode from "./clientQRcode";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
@@ -51,14 +51,17 @@ export default function Client() {
     fetchData();
   }, []);
   return (
-    <div style={{ height: 400, width: "100%" }}>
-      <DataGrid rows={clients} columns={columns} getRowId={getRowId} />
-      <Dialog onClose={handleClose} open={open}>
-        <Box sx={{padding: `0 32px 15px`}}>
-          <DialogTitle>QR Code for {selectedClient.name}</DialogTitle>
-          <ClientQRCode clientId={selectedClient.clientId} />
-        </Box>
-      </Dialog>
-    </div>
+    <Container>
+      <Button variant="outlined">Add New Client</Button>
+      <div style={{ height: 400, width: "95vw" }}>
+        <DataGrid rows={clients} columns={columns} getRowId={getRowId} />
+        <Dialog onClose={handleClose} open={open}>
+          <Box sx={{ padding: `0 32px 15px` }}>
+            <DialogTitle>QR Code for {selectedClient.name}</DialogTitle>
+            <ClientQRCode clientId={selectedClient.clientId} />
+          </Box>
+        </Dialog>
+      </div>
+    </Container>
   );
 }
