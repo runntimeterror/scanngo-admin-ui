@@ -1,17 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button, Box, Container } from "@mui/material";
+import {
+  Button,
+  Box,
+  Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Stack,
+} from "@mui/material";
 import ClientQRCode from "./clientQRcode";
-import DialogTitle from "@mui/material/DialogTitle";
-import Dialog from "@mui/material/Dialog";
+import { useTheme, styled } from "@mui/material/styles";
 
+const StyledRoot = styled("div")(() => {
+  const theme = useTheme();
+  return {
+    [theme.breakpoints.up("md")]: { height: 400, width: "100%" },
+    [theme.breakpoints.down("md")]: { width: "85vw" },
+  };
+});
 export default function Client() {
-  const [open, setOpen] = React.useState(false);
+  const [openQRDialog, setOpenQRDialog] = React.useState(false);
+  const [newClientFormDialog, setNewClientFormDialog] = React.useState(false);
   const [selectedClient, setSelectedClient] = React.useState({});
   const [clients, setCient] = useState([]);
 
-  const handleClose = (value) => {
-    setOpen(false);
+  const handleNewClientFormClose = () => {
+    setNewClientFormDialog(false);
+  };
+
+  const handleQRClose = (value) => {
+    setOpenQRDialog(false);
   };
   const columns = [
     { field: "name", headerName: "Name", width: 100 },
@@ -31,7 +51,7 @@ export default function Client() {
 
   const generateQRCode = (client) => {
     setSelectedClient(client);
-    setOpen(true);
+    setOpenQRDialog(true);
   };
 
   const getRowId = (client) => {
@@ -52,16 +72,30 @@ export default function Client() {
   }, []);
   return (
     <Container>
-      <Button variant="outlined">Add New Client</Button>
-      <div style={{ height: 400, width: "95vw" }}>
+      <Button variant="outlined" onClick={() => setNewClientFormDialog(true)}>
+        Add New Client
+      </Button>
+      <StyledRoot>
         <DataGrid rows={clients} columns={columns} getRowId={getRowId} />
-        <Dialog onClose={handleClose} open={open}>
+        <Dialog onClose={handleQRClose} open={openQRDialog}>
           <Box sx={{ padding: `0 32px 15px` }}>
             <DialogTitle>QR Code for {selectedClient.name}</DialogTitle>
-            <ClientQRCode clientId={selectedClient.clientId} />
+            <DialogContent>
+              <ClientQRCode clientId={selectedClient.clientId} />{" "}
+            </DialogContent>
           </Box>
         </Dialog>
-      </div>
+        <Dialog open={newClientFormDialog} onClose={handleNewClientFormClose}>
+          <DialogTitle>Onboard New Client</DialogTitle>
+          <DialogContent>
+            <Stack></Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleNewClientFormClose}>Cancel</Button>
+            <Button onClick={handleNewClientFormClose}>Save</Button>
+          </DialogActions>
+        </Dialog>
+      </StyledRoot>
     </Container>
   );
 }
