@@ -41,7 +41,7 @@ const Product = () => {
 
     const token = localStorage.getItem("token");
     // const sessionId = getCookie("sessionId");
-    // const clientId = getCookie("storeId") || sessionId;
+    // const clientId = getCookie("clientId") || sessionId;
     const headers = new Headers({
         "Content-Type": "application/json",
         // "Session-Id": sessionId,
