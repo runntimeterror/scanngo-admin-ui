@@ -1,28 +1,21 @@
 import bcrypt from "bcryptjs";
 import { API_DOMAIN } from "../../../utils";
+import { getCookie } from "cookies-next";
 
 async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
-
+  const sessionId = getCookie("sessionId", { req, res });
   const { userName, password, clientId, token, email } = req.body;
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-
-  console.log(
-    `Registering user: ${JSON.stringify({
-      userName,
-      password: hashedPassword,
-      clientId,
-      email,
-    })}`
-  );
   const resp = await fetch(`${API_DOMAIN}/user/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      "Session-Id": sessionId
     },
     body: JSON.stringify({
       userName,

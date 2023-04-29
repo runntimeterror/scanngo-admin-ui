@@ -68,8 +68,8 @@ export default function ClientUsers(props) {
         password: password.value,
       }),
     });
-    const serviceRespJson = await resp.json();
-    debugger;
+    setNewUserFormDialog(false);
+    fetchData();
   };
 
   const fetchData = async () => {
