@@ -22,26 +22,38 @@ const StyledRoot = styled("div")(() => {
   };
 });
 
-const getRowId = (user) => {
-  return user.userId;
-};
-
-const columns = [
-  { field: "username", headerName: "Name", width: 100 },
-  { field: "email", headerName: "Email", width: 180 },
-  {
-    field: "del",
-    headerName: "",
-    width: 80,
-    renderCell: (params) => (
-      <IconButton onClick={() => deleteClient(params.row)} aria-label="delete">
-        <DeleteIcon />
-      </IconButton>
-    ),
-  },
-];
-
 export default function ClientUsers(props) {
+  const columns = [
+    { field: "username", headerName: "Name", width: 100 },
+    { field: "email", headerName: "Email", width: 180 },
+    {
+      field: "del",
+      headerName: "",
+      width: 80,
+      renderCell: (params) => (
+        <IconButton onClick={() => deleteUser(params.row)} aria-label="delete">
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
+  ];
+
+  const getRowId = (user) => {
+    return user.userId;
+  };
+
+  const deleteUser = async (user) => {
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/user/${user.userId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token, clientId: props.clientId }),
+    });
+    fetchData();
+  };
+
   const [users, setUsers] = useState([]);
   const [newUserFormDialog, setNewUserFormDialog] = React.useState(false);
 
