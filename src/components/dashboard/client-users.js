@@ -27,7 +27,7 @@ const getRowId = (user) => {
 };
 
 const columns = [
-  { field: "userName", headerName: "Name", width: 100 },
+  { field: "username", headerName: "Name", width: 100 },
   { field: "email", headerName: "Email", width: 180 },
   {
     field: "del",
@@ -49,9 +49,51 @@ export default function ClientUsers(props) {
     setNewUserFormDialog(false);
   };
 
-  const saveUser = () => {
+  const saveUser = async (event) => {
+    event.preventDefault();
+    const formElements = event.target.elements;
+    const { userName, email, password } = formElements;
+    const { clientId } = props;
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token,
+        clientId,
+        userName: userName.value,
+        email: email.value,
+        password: password.value,
+      }),
+    });
+    const serviceRespJson = await resp.json();
+    debugger;
+  };
 
-  }
+  const fetchData = async () => {
+    const { clientId } = props;
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token,
+        clientId,
+      }),
+    });
+    const serviceRespJson = await resp.json();
+    if (!!serviceRespJson) {
+      setUsers(serviceRespJson);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <Container>
@@ -64,12 +106,7 @@ export default function ClientUsers(props) {
       </Button>
 
       <StyledRoot>
-        <DataGrid
-          rows={users}
-          columns={columns}
-          getRowId={getRowId}
-          paginationModel={{ page: 0, pageSize: 5 }}
-        />
+        <DataGrid rows={users} columns={columns} getRowId={getRowId} />
         <Dialog open={newUserFormDialog} onClose={handleNewUserFormClose}>
           <form onSubmit={saveUser}>
             <DialogTitle>Create New User for {props.name}</DialogTitle>
