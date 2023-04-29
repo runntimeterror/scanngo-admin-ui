@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react'; // the AG Grid React Component
+import { Button } from "@mui/material";
+import { API_DOMAIN } from "../../../utils";
+import { getCookie } from "cookies-next";
+import styles from '../../styles/Home.module.css'
 
 import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Optional theme CSS
@@ -35,11 +39,15 @@ const Product = () => {
         console.debug('cellClicked', event);
     }, []);
 
+    const token = localStorage.getItem("token");
+    // const sessionId = getCookie("sessionId");
+    // const clientId = getCookie("storeId") || sessionId;
     const headers = new Headers({
-        "Client-Id": "d4952489-d57c-11ed-ab65-062dad11b3d9",
-        "Session-Id": "d4952489-d57c-11ed-ab65-062dad11b3d9",
-        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2ODE2MDA0NzEsImV4cCI6MTcxMzEzNjQ3MSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoiYXNkYXNkIiwiYWNjZXNzTGV2ZWwiOiIxIn0.teOTq_cdmCNlRuJ0tl88ffYdzGVLxv-sO6o47jydZc4"
-    });
+        "Content-Type": "application/json",
+        // "Session-Id": sessionId,
+        // "Client-Id": clientId,
+        Authorization: `Bearer ${token}`,
+      });
 
     const config = {
         method: 'GET',
@@ -47,11 +55,7 @@ const Product = () => {
         //mode: 'cors'
     };
 
-    //const host = 'http://scanngo-api-alb-1470236169.us-west-2.elb.amazonaws.com'
-    //const host = 'http://localhost:8081'
-    //const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
-    const host = 'https://api.scanngo.link'
-    //const host = '/api'
+    const host = '/api';//API_DOMAIN
 
     const loadData = () => {
         fetch(host + '/product', config)
@@ -143,10 +147,18 @@ const Product = () => {
         <div>
 
             {/* Example using Grid's API */}
-            <button onClick={buttonListener}>Deselect All</button>
-            <button onClick={insertButtonListener}>New Row</button>
-            <button onClick={onRemoveSelected}>Remove Selected</button>
-            <button onClick={refresh}>Refresh</button>
+            <Button variant="outlined" onClick={buttonListener} className={styles.buttonMargins}>
+                Deselect all
+            </Button>
+            <Button variant="outlined" onClick={insertButtonListener} className={styles.buttonMargins}>
+                New row
+            </Button>
+            <Button variant="outlined" onClick={onRemoveSelected} className={styles.buttonMargins}>
+                Remove selected
+            </Button>
+            <Button variant="outlined" onClick={refresh} className={styles.buttonMargins}>
+                Refresh
+            </Button>
 
             {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
             {/* <div className="ag-theme-alpine" style={{ width: 500, height: 500 }}> */}

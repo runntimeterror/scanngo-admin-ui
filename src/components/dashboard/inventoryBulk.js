@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
+import { API_DOMAIN } from "../../../utils";
+import { getCookie } from "cookies-next";
 import { Importer, ImporterField } from 'react-csv-importer';
 
 // include the widget CSS file whichever way your bundler supports it
 //import 'react-csv-importer/dist/index.css';
 
-//const host = 'http://scanngo-new-vpc-alb-516249725.us-west-2.elb.amazonaws.com'
-const host = 'https://api.scanngo.link'
-//const host = 'http://localhost:8081'
+const host = API_DOMAIN;
+const token = "123";//localStorage.getItem("token");
+const sessionId = getCookie("sessionId");
+const clientId = getCookie("storeId") || sessionId;
 const headers = new Headers({
-    "Client-Id": "d4952489-d57c-11ed-ab65-062dad11b3d9",
-    "Session-Id": "d4952489-d57c-11ed-ab65-062dad11b3d9",
-    "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2ODE2MDA0NzEsImV4cCI6MTcxMzEzNjQ3MSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoiYXNkYXNkIiwiYWNjZXNzTGV2ZWwiOiIxIn0.teOTq_cdmCNlRuJ0tl88ffYdzGVLxv-sO6o47jydZc4"
-});
+    "Content-Type": "application/json",
+    "Session-Id": sessionId,
+    "Client-Id": clientId,
+    Authorization: `Bearer ${token}`,
+  });
 
 const InventoryBulk = () => {
     const [err, setErr] = useState('');
