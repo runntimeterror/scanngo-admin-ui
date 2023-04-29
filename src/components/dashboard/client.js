@@ -75,17 +75,17 @@ ${state.value} ${zip.value}`,
     {
       field: "link",
       headerName: "",
-      width: 150,
+      width: 100,
       renderCell: (params) => (
         <Button variant="outlined" onClick={() => generateQRCode(params.row)}>
-          View QR Code
+          QR Code
         </Button>
       ),
     },
     {
       field: "users",
       headerName: "",
-      width: 100,
+      width: 160,
       renderCell: (params) => (
         <Button variant="outlined" onClick={() => generateQRCode(params.row)}>
           Manage Users
