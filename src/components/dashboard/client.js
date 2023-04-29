@@ -14,6 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ClientQRCode from "./clientQRcode";
 import { useTheme, styled } from "@mui/material/styles";
 import ClientCreate from "./client-create";
+import ClientUsers from "./client-users";
 
 const StyledRoot = styled("div")(() => {
   const theme = useTheme();
@@ -25,6 +26,7 @@ const StyledRoot = styled("div")(() => {
 export default function Client() {
   const [openQRDialog, setOpenQRDialog] = React.useState(false);
   const [newClientFormDialog, setNewClientFormDialog] = React.useState(false);
+  const [manageUserFormDialog, setManageUserFormDialog] = React.useState(false);
   const [selectedClient, setSelectedClient] = React.useState({});
   const [clients, setCient] = useState([]);
 
@@ -60,7 +62,6 @@ ${state.value} ${zip.value}`,
       },
       body: JSON.stringify({ payload, token }),
     });
-    const serviceRespJson = await resp.json();
     fetchData();
     setNewClientFormDialog(false);
   };
@@ -87,7 +88,7 @@ ${state.value} ${zip.value}`,
       headerName: "",
       width: 160,
       renderCell: (params) => (
-        <Button variant="outlined" onClick={() => generateQRCode(params.row)}>
+        <Button variant="outlined" onClick={() => manageStoreUser(params.row)}>
           Manage Users
         </Button>
       ),
@@ -118,6 +119,15 @@ ${state.value} ${zip.value}`,
     });
     const serviceRespJson = await resp.json();
     fetchData();
+  };
+
+  const handleManageUserDialogClose = () => {
+    setManageUserFormDialog(false);
+  };
+
+  const manageStoreUser = (client) => {
+    setSelectedClient(client);
+    setManageUserFormDialog(true);
   };
 
   const generateQRCode = (client) => {
@@ -172,6 +182,15 @@ ${state.value} ${zip.value}`,
               <Button type="submit">Save</Button>
             </DialogActions>
           </form>
+        </Dialog>
+
+        <Dialog
+          onClose={handleManageUserDialogClose}
+          open={manageUserFormDialog}
+        >
+          <Box sx={{ padding: `32px 15px` }}>
+            <ClientUsers {...selectedClient} />
+          </Box>
         </Dialog>
       </StyledRoot>
     </Container>
