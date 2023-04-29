@@ -158,6 +158,7 @@ ${state.value} ${zip.value}`,
       </Button>
       <StyledRoot>
         <DataGrid
+          hideFooter
           rows={clients}
           columns={columns}
           getRowId={getRowId}

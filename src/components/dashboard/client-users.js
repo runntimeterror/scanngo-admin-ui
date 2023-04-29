@@ -118,7 +118,12 @@ export default function ClientUsers(props) {
       </Button>
 
       <StyledRoot>
-        <DataGrid rows={users} columns={columns} getRowId={getRowId} />
+        <DataGrid
+          hideFooter
+          rows={users}
+          columns={columns}
+          getRowId={getRowId}
+        />
         <Dialog open={newUserFormDialog} onClose={handleNewUserFormClose}>
           <form onSubmit={saveUser}>
             <DialogTitle>Create New User for {props.name}</DialogTitle>
