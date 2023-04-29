@@ -30,7 +30,7 @@ export default function Client() {
     setNewClientFormDialog(false);
   };
 
-  const saveClient = (event) => {
+  const saveClient = async (event) => {
     event.preventDefault();
     const formElements = event.target.elements;
     const {
@@ -50,6 +50,17 @@ ${city.value}
 ${state.value} ${zip.value}`,
       primaryContact: primaryContact.value,
     };
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/client`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ payload, token }),
+    });
+    const serviceRespJson = await resp.json();
+    fetchData();
+    setNewClientFormDialog(false);
   };
 
   const handleQRClose = (value) => {
@@ -79,17 +90,17 @@ ${state.value} ${zip.value}`,
   const getRowId = (client) => {
     return client.clientId;
   };
+  const fetchData = async () => {
+    const resp = await fetch(`/api/client`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const serviceRespJson = await resp.json();
+    setCient(serviceRespJson);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const resp = await fetch(`/api/client`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const serviceRespJson = await resp.json();
-      setCient(serviceRespJson);
-    };
     fetchData();
   }, []);
   return (
