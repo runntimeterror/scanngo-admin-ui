@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { API_DOMAIN } from "../../../utils";
+import { serialize } from "cookie";
 
 async function handler(req, res) {
   if (req.method !== "POST") {
@@ -24,11 +25,15 @@ async function handler(req, res) {
         expiresIn: "1y",
       }
     );
-
+    const cookie = serialize("clientId", user.clientId, {
+      httpOnly: true,
+      path: "/",
+    });
+    res.setHeader("Set-Cookie", cookie);
     return res.status(200).json({ token });
   }
   return res.status(401).json({ message: "Invalid credentials" });
-  
+
   /*
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);

@@ -7,7 +7,7 @@ async function handler(req, res) {
   console.log('req', req.headers);
 
   const sessionId = getCookie("sessionId", { req, res });
-  let clientId = getCookie("storeId", { req, res });
+  let clientId = getCookie("clientId", { req, res });
   if (!clientId) {
     clientId = sessionId;
   }
