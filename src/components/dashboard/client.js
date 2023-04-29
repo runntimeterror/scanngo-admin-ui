@@ -162,7 +162,6 @@ ${state.value} ${zip.value}`,
           rows={clients}
           columns={columns}
           getRowId={getRowId}
-          paginationModel={{ page: 0, pageSize: 5 }}
         />
         <Dialog onClose={handleQRClose} open={openQRDialog}>
           <Box sx={{ padding: `0 32px 15px` }}>
