@@ -29,7 +29,7 @@ const StyledRoot = styled("div")(() => {
   const theme = useTheme();
   return {
     [theme.breakpoints.up("md")]: { height: 400, width: "100%" },
-    [theme.breakpoints.down("md")]: { width: "85vw" },
+    [theme.breakpoints.down("md")]: { height: 400, width: "85vw" },
   };
 });
 export default function Client() {
@@ -88,7 +88,12 @@ export default function Client() {
         Add New Client
       </Button>
       <StyledRoot>
-        <DataGrid rows={clients} columns={columns} getRowId={getRowId} />
+        <DataGrid
+          rows={clients}
+          columns={columns}
+          getRowId={getRowId}
+          paginationModel={{ page: 0, pageSize: 5 }}
+        />
         <Dialog onClose={handleQRClose} open={openQRDialog}>
           <Box sx={{ padding: `0 32px 15px` }}>
             <DialogTitle>QR Code for {selectedClient.name}</DialogTitle>
