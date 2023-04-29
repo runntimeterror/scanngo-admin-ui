@@ -24,12 +24,14 @@ export default function ClientCreate() {
         name="clientName"
         label="Store Name"
         variant="standard"
+        required
       />
       <TextField
         id="addressLine1"
         name="storeAddress1"
         label="Address (Street Name, Number)"
         variant="standard"
+        required
       />
       <TextField
         id="addressLine2"
@@ -43,6 +45,7 @@ export default function ClientCreate() {
           name="city"
           label="City"
           variant="standard"
+          required
         />
         <FormControl sx={{ minWidth: 120, flexGrow: 1 }}>
           <InputLabel id="addressState">State</InputLabel>
@@ -72,6 +75,7 @@ export default function ClientCreate() {
         name="primaryContact"
         label="Primary Contact"
         variant="standard"
+        required
       />
     </Stack>
   );

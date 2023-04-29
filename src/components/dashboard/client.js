@@ -8,10 +8,13 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  IconButton,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ClientQRCode from "./clientQRcode";
 import { useTheme, styled } from "@mui/material/styles";
 import ClientCreate from "./client-create";
+import ClientUsers from "./client-users";
 
 const StyledRoot = styled("div")(() => {
   const theme = useTheme();
@@ -23,6 +26,7 @@ const StyledRoot = styled("div")(() => {
 export default function Client() {
   const [openQRDialog, setOpenQRDialog] = React.useState(false);
   const [newClientFormDialog, setNewClientFormDialog] = React.useState(false);
+  const [manageUserFormDialog, setManageUserFormDialog] = React.useState(false);
   const [selectedClient, setSelectedClient] = React.useState({});
   const [clients, setCient] = useState([]);
 
@@ -30,7 +34,7 @@ export default function Client() {
     setNewClientFormDialog(false);
   };
 
-  const saveClient = (event) => {
+  const saveClient = async (event) => {
     event.preventDefault();
     const formElements = event.target.elements;
     const {
@@ -50,6 +54,16 @@ ${city.value}
 ${state.value} ${zip.value}`,
       primaryContact: primaryContact.value,
     };
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/client`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ payload, token }),
+    });
+    fetchData();
+    setNewClientFormDialog(false);
   };
 
   const handleQRClose = (value) => {
@@ -62,14 +76,59 @@ ${state.value} ${zip.value}`,
     {
       field: "link",
       headerName: "",
-      width: 150,
+      width: 100,
       renderCell: (params) => (
         <Button variant="outlined" onClick={() => generateQRCode(params.row)}>
-          View QR Code
+          QR Code
         </Button>
       ),
     },
+    {
+      field: "users",
+      headerName: "",
+      width: 160,
+      renderCell: (params) => (
+        <Button variant="outlined" onClick={() => manageStoreUser(params.row)}>
+          Manage Users
+        </Button>
+      ),
+    },
+    {
+      field: "del",
+      headerName: "",
+      width: 80,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => deleteClient(params.row)}
+          aria-label="delete"
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
   ];
+
+  const deleteClient = async (client) => {
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/client/${client.clientId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token }),
+    });
+    const serviceRespJson = await resp.json();
+    fetchData();
+  };
+
+  const handleManageUserDialogClose = () => {
+    setManageUserFormDialog(false);
+  };
+
+  const manageStoreUser = (client) => {
+    setSelectedClient(client);
+    setManageUserFormDialog(true);
+  };
 
   const generateQRCode = (client) => {
     setSelectedClient(client);
@@ -79,17 +138,17 @@ ${state.value} ${zip.value}`,
   const getRowId = (client) => {
     return client.clientId;
   };
+  const fetchData = async () => {
+    const resp = await fetch(`/api/client`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const serviceRespJson = await resp.json();
+    setCient(serviceRespJson);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const resp = await fetch(`/api/client`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const serviceRespJson = await resp.json();
-      setCient(serviceRespJson);
-    };
     fetchData();
   }, []);
   return (
@@ -123,6 +182,15 @@ ${state.value} ${zip.value}`,
               <Button type="submit">Save</Button>
             </DialogActions>
           </form>
+        </Dialog>
+
+        <Dialog
+          onClose={handleManageUserDialogClose}
+          open={manageUserFormDialog}
+        >
+          <Box sx={{ padding: `32px 15px` }}>
+            <ClientUsers {...selectedClient} />
+          </Box>
         </Dialog>
       </StyledRoot>
     </Container>
