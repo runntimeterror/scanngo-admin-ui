@@ -15,7 +15,9 @@ async function handler(req, res) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
-      "Session-Id": sessionId
+      "Session-Id": sessionId,
+      "Client-Id": clientId
+
     },
     body: JSON.stringify({
       userName,
