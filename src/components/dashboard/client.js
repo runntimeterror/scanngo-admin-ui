@@ -8,7 +8,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  IconButton,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ClientQRCode from "./clientQRcode";
 import { useTheme, styled } from "@mui/material/styles";
 import ClientCreate from "./client-create";
@@ -80,7 +82,43 @@ ${state.value} ${zip.value}`,
         </Button>
       ),
     },
+    {
+      field: "users",
+      headerName: "",
+      width: 100,
+      renderCell: (params) => (
+        <Button variant="outlined" onClick={() => generateQRCode(params.row)}>
+          Manage Users
+        </Button>
+      ),
+    },
+    {
+      field: "del",
+      headerName: "",
+      width: 80,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => deleteClient(params.row)}
+          aria-label="delete"
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
   ];
+
+  const deleteClient = async (client) => {
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/client/${client.clientId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token }),
+    });
+    const serviceRespJson = await resp.json();
+    fetchData();
+  };
 
   const generateQRCode = (client) => {
     setSelectedClient(client);
