@@ -105,7 +105,7 @@ function Dashboard(props) {
       case DASHBOARD_SECTIONS.INVENTORY.label:
         return <Inventory accessLevel={accessLevel}/>;
       case DASHBOARD_SECTIONS.PRODUCT.label:
-        return <Product />;
+        return <Product accessLevel={accessLevel}/>;
       }
   };
 
