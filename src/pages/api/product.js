@@ -1,8 +1,6 @@
 import { API_DOMAIN } from "../../../utils";
 import { getCookie } from "cookies-next";
 
-const endpoint = 'product'
-
 async function handler(req, res) {
   console.log('req', req.headers);
 
@@ -17,25 +15,27 @@ async function handler(req, res) {
     "Client-Id": clientId,
     Authorization: req.headers.authorization
   });
-  console.log('headers', JSON.stringify(Object.fromEntries([...headers])));
 
   const request = req.body;
   let resp
   if (req.method === 'GET') {
-    resp = await fetch(`${API_DOMAIN}/` + endpoint, {
+    resp = await fetch(`${API_DOMAIN}/product`, {
       method: req.method,
       headers: headers
     });
   }
   else if (req.method === 'POST') {
-    resp = await fetch(`${API_DOMAIN}/` + endpoint, {
+    resp = await fetch(`${API_DOMAIN}/product`, {
       method: req.method,
-      headers: req.headers,
-      body: request,
+      headers: headers,
+      body: JSON.stringify(request),
     });
   }
-  const body = await resp.json();
-  return res.status(200).json(body);
+  if(resp.status === 200) {
+    const body = await resp.json();
+    return res.status(resp.status).json(body);
+  }
+  return res.status(resp.status).json("something went wrong")
 }
 
 export default handler;

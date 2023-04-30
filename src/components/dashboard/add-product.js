@@ -9,13 +9,53 @@ import {
   InputAdornment,
   IconButton,
   FormControl,
-  InputLabel
+  InputLabel,
 } from "@mui/material";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
 
-export default function AddProduct() {
+export default function AddProduct(props) {
+  const saveProduct = async (event) => {
+    event.preventDefault();
+
+    const formElements = event.target.elements;
+    const {
+      name,
+      barcode,
+      type,
+      category,
+      brand,
+      price,
+      modelName,
+      modelNumber,
+    } = formElements;
+
+    const payload = [
+      {
+        name: name.value,
+        barcode: barcode.value,
+        productType: type.value,
+        programCategory: category.value,
+        brandName: brand.value,
+        price: +price.value,
+        modelName: modelName.value,
+        modelNumber: modelNumber.value,
+      },
+    ];
+    const token = localStorage.getItem("token");
+    const resp = await fetch(`/api/product`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    if(resp.status === 200) {
+        props.successCallback()
+    }
+  };
   return (
-    <form>
+    <form onSubmit={saveProduct}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         Add Product
       </Typography>
