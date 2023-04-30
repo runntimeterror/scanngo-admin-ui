@@ -42,7 +42,6 @@ export default function AddInventory(props) {
       qty: +formElements.qty.value,
       price: +formElements.price.value,
     };
-    debugger;
   };
   useEffect(() => {
     fetchProducts();
