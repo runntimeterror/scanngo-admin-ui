@@ -4,10 +4,9 @@ import { getCookie } from "cookies-next";
 const endpoint = "inventory";
 
 async function handler(req, res) {
-  console.log("req", req.headers);
-debugger
   const sessionId = getCookie("sessionId", { req, res });
-  const clientId = req.headers["client-id"] || getCookie("clientId", { req, res });
+  const clientId =
+    req.headers["client-id"] || getCookie("clientId", { req, res });
 
   const headers = new Headers({
     "Content-Type": "application/json",
@@ -15,11 +14,10 @@ debugger
     "Client-Id": clientId,
     Authorization: req.headers.authorization,
   });
-  console.log("headers", JSON.stringify(Object.fromEntries([...headers])));
 
   const request = req.body;
   let resp;
-  if (req.method === "GET") {
+  if (req.method === "GET" || req.method === "DELETE") {
     resp = await fetch(`${API_DOMAIN}/` + endpoint, {
       method: req.method,
       headers: headers,

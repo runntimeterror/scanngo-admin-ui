@@ -9,7 +9,6 @@ import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import { Button, Stack, Autocomplete, TextField } from "@mui/material";
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
-import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
 
 const Inventory = (props) => {
   const { accessLevel } = props;
@@ -67,20 +66,22 @@ const Inventory = (props) => {
 
   const token = localStorage.getItem("token");
 
-  const host = "/api";
-
   const handleClientIDSelection = (event, client) => {
     fetchInventory(client.id);
   };
 
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+
   const fetchInventory = async (clientId) => {
+    if (clientId) {
+      headers["Client-Id"] = clientId;
+    }
     const servResp = await fetch(`/api/inventory`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Client-Id": clientId,
-      },
+      headers,
     });
     const rowData = await servResp.json();
     setRowData(rowData);
@@ -103,10 +104,9 @@ const Inventory = (props) => {
       const requestOptions = {
         method: "DELETE",
         headers: headers,
-        body: jsonStr,
       };
       try {
-        fetch(host + "/inventory/" + row.inventoryProductId, requestOptions)
+        fetch("/api/inventory/" + row.inventoryProductId, requestOptions)
           .then((response) => response.json())
           .then((data) =>
             console.log("DELETE response: " + JSON.stringify(data))
@@ -128,7 +128,7 @@ const Inventory = (props) => {
       headers: headers,
       body: jsonStr,
     };
-    fetch(host + "/inventory/" + data.inventoryProductId, requestOptions)
+    fetch("/api/inventory/" + data.inventoryProductId, requestOptions)
       .then((response) => response.json())
       .then((data) => console.log("PUT response: " + JSON.stringify(data)));
     //.then(data => this.setState({ postId: data.id }));
