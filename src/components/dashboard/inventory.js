@@ -127,6 +127,44 @@ const Inventory = (props) => {
       .then(() => conditionallyFetchInventory());
   };
 
+
+  const download = function (data) {
+ 
+    const blob = new Blob([data], { type: 'text/csv' }); 
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+ 
+    a.setAttribute('href', url)
+    a.setAttribute('download', 'download.csv');
+    a.click()
+}
+ 
+const get = async function () {
+ 
+   const data = [
+    { productId: 1, qty:0, price:0.00 },
+    { productId: 1, qty:0, price:0.00 },
+    { productId: 1, qty:0, price:0.00 },
+  ];
+ 
+  const csvString = [
+    [
+      "productId",
+      "qty",
+      "price"
+    ],
+    ...data.map(item => [
+      item.productId,
+      item.qty,
+      item.price
+    ])
+  ].map(e => e.join(",")) 
+  .join("\n");
+
+    download(csvString);
+}
+ 
+
   return (
     <div>
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
@@ -137,7 +175,7 @@ const Inventory = (props) => {
         >
           Add Inventory
         </Button>
-        <Button variant="outlined">Bulk upload</Button>
+        <Button variant="outlined" onClick={() => get()}>Bulk upload</Button>
         {accessLevel == 1 ? (
           <Autocomplete
             disablePortal
