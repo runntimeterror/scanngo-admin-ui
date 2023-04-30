@@ -102,6 +102,16 @@ const Inventory = (props) => {
     }
   }, []);
 
+  const handleAddComplete = () => {
+    setNewInventoryFormDialog(false);
+    const { accessLevel } = props;
+    if (accessLevel == 1) {
+      fetchClient();
+    } else {
+      fetchInventory();
+    }
+  }
+
   const onRemoveSelected = useCallback(() => {
     const rows = gridRef.current.api.getSelectedRows();
     for (let row of rows) {
@@ -187,7 +197,7 @@ const Inventory = (props) => {
         open={newInventoryFormDialog}
       >
         <Box sx={{ padding: `32px 15px` }}>
-          <AddInventory {...client} />
+          <AddInventory successCallback={handleAddComplete} {...client} />
         </Box>
       </Dialog>
     </div>

@@ -54,6 +54,9 @@ export default function AddInventory(props) {
       headers,
       body: JSON.stringify(payload),
     });
+    if(servResp.status === 200) {
+        props.successCallback()
+    }
   };
   useEffect(() => {
     fetchProducts();
