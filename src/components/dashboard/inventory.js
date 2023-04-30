@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { isEmpty } from "lodash";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import {
@@ -17,6 +12,7 @@ import {
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import AddInventory from "./add-inventory";
+import AddBulkInventory from "./add-bulk-inventory";
 
 const Inventory = (props) => {
   const { accessLevel } = props;
@@ -24,6 +20,7 @@ const Inventory = (props) => {
   const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
   const [newInventoryFormDialog, setNewInventoryFormDialog] =
     React.useState(false);
+  const [bulkUploadFormDialog, setBulkUploadFormDialog] = React.useState(false);
   const [clients, setClients] = React.useState([]);
   const [client, selectClient] = React.useState({});
   const fetchClient = async () => {
@@ -93,24 +90,35 @@ const Inventory = (props) => {
   };
 
   useEffect(() => {
-    const { accessLevel } = props;
     conditionallyFetchInventory();
   }, []);
 
   const conditionallyFetchInventory = () => {
     const { accessLevel } = props;
     if (accessLevel == 1) {
-      fetchClient();
+      if (isEmpty(client)) {
+        fetchClient();
+      } else {
+        fetchInventory(client.id);
+      }
     } else {
       fetchInventory();
     }
+  };
+
+  const handleBulkUploadDialogClose = () => {
+    setBulkUploadFormDialog(false);
+  };
+
+  const handleBulkUploadComplete = () => {
+    setBulkUploadFormDialog(false);
+    conditionallyFetchInventory();
   };
 
   const handleAddComplete = () => {
     setNewInventoryFormDialog(false);
     conditionallyFetchInventory();
   };
-
 
   const onCellValueChanged = (event) => {
     const { qty, price, productId } = event.data;
@@ -137,7 +145,13 @@ const Inventory = (props) => {
         >
           Add Inventory
         </Button>
-        <Button variant="outlined">Bulk upload</Button>
+        <Button
+          variant="outlined"
+          disabled={accessLevel == 1 && isEmpty(client)}
+          onClick={() => setBulkUploadFormDialog(true)}
+        >
+          Bulk upload
+        </Button>
         {accessLevel == 1 ? (
           <Autocomplete
             disablePortal
@@ -172,6 +186,14 @@ const Inventory = (props) => {
       >
         <Box sx={{ padding: `32px 15px` }}>
           <AddInventory successCallback={handleAddComplete} {...client} />
+        </Box>
+      </Dialog>
+      <Dialog onClose={handleBulkUploadDialogClose} open={bulkUploadFormDialog}>
+        <Box sx={{ padding: `32px 15px` }}>
+          <AddBulkInventory
+            successCallback={handleBulkUploadComplete}
+            {...client}
+          />
         </Box>
       </Dialog>
     </div>
