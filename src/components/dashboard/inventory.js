@@ -6,15 +6,24 @@ import React, {
   useCallback,
 } from "react";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
-import { Button, Stack, Autocomplete, TextField } from "@mui/material";
+import {
+  Button,
+  Stack,
+  Autocomplete,
+  TextField,
+  Dialog,
+  Box,
+} from "@mui/material";
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
+import AddInventory from "./add-inventory";
 
 const Inventory = (props) => {
   const { accessLevel } = props;
   const gridRef = useRef(); // Optional - for accessing Grid's API
   const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
-
+  const [newInventoryFormDialog, setNewInventoryFormDialog] =
+    React.useState(false);
   const [clients, setClients] = React.useState([]);
   const fetchClient = async () => {
     const resp = await fetch(`/api/client`, {
@@ -25,6 +34,9 @@ const Inventory = (props) => {
     });
     const serviceRespJson = await resp.json();
     setClients(serviceRespJson);
+  };
+  const handleAddInventoryDialogClose = () => {
+    setNewInventoryFormDialog(false);
   };
 
   // Each Column Definition results in one Column.
@@ -131,6 +143,12 @@ const Inventory = (props) => {
         <Button variant="outlined" onClick={onRemoveSelected}>
           Remove selected
         </Button>
+        <Button
+          variant="outlined"
+          onClick={() => setNewInventoryFormDialog(true)}
+        >
+          Add Inventory
+        </Button>
         <Button variant="outlined">Bulk upload</Button>
         {accessLevel == 1 ? (
           <Autocomplete
@@ -144,7 +162,6 @@ const Inventory = (props) => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                sx={{ alignSelf: "flex-end" }}
                 variant="outlined"
                 label="Store"
               />
@@ -165,6 +182,14 @@ const Inventory = (props) => {
           onRowValueChanged={onRowValueChanged} // Optional - registering for Grid Event
         />
       </div>
+      <Dialog
+        onClose={handleAddInventoryDialogClose}
+        open={newInventoryFormDialog}
+      >
+        <Box sx={{ padding: `32px 15px` }}>
+          <AddInventory />
+        </Box>
+      </Dialog>
     </div>
   );
 };
