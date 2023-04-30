@@ -58,7 +58,7 @@ const Inventory = (props) => {
       editable: true,
       valueParser: (params) => Number(params.newValue),
     },
-    { field: "barcode", filter: true, type: "numericColumn", editable: true },
+    { field: "barcode", filter: true, type: "numericColumn" },
     { field: "programCategory", filter: true },
     { field: "productType", filter: true },
   ]);
