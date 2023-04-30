@@ -112,29 +112,6 @@ const Inventory = (props) => {
     }
   }
 
-  const onRemoveSelected = useCallback(() => {
-    const rows = gridRef.current.api.getSelectedRows();
-    for (let row of rows) {
-      const jsonStr = JSON.stringify(row);
-      console.debug("onRemoveSelected: (" + jsonStr + ")");
-      const requestOptions = {
-        method: "DELETE",
-        headers: headers,
-      };
-      try {
-        fetch("/api/inventory/" + row.inventoryProductId, requestOptions)
-          .then((response) => response.json())
-          .then((data) =>
-            console.log("DELETE response: " + JSON.stringify(data))
-          )
-          .then((data) => gridRef.current.api.applyTransaction({ remove: row }))
-          .catch((error) => console.error(error));
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }, []);
-
   const onRowValueChanged = useCallback((event) => {
     var data = event.data;
     const jsonStr = JSON.stringify(data);
@@ -153,9 +130,6 @@ const Inventory = (props) => {
   return (
     <div>
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-        <Button variant="outlined" onClick={onRemoveSelected}>
-          Remove selected
-        </Button>
         <Button
           variant="outlined"
           disabled={accessLevel == 1 && isEmpty(client)}

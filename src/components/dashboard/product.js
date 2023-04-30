@@ -6,8 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
-import { Button } from "@mui/material";
-import styles from "../../styles/Home.module.css";
+import { Button, Stack } from "@mui/material";
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
@@ -47,19 +46,14 @@ const Product = (props) => {
   }, []);
 
   const token = localStorage.getItem("token");
-  // const sessionId = getCookie("sessionId");
-  // const clientId = getCookie("clientId") || sessionId;
   const headers = new Headers({
     "Content-Type": "application/json",
-    // "Session-Id": sessionId,
-    // "Client-Id": clientId,
     Authorization: `Bearer ${token}`,
   });
 
   const config = {
     method: "GET",
     headers: headers,
-    //mode: 'cors'
   };
 
   const host = "/api"; //API_DOMAIN
@@ -75,26 +69,6 @@ const Product = (props) => {
       setFirstRender(true);
     }
   }, [firstRender]);
-
-  const refresh = useCallback((e) => {
-    loadData();
-  }, []);
-
-  // Example using Grid's API
-  const buttonListener = useCallback((e) => {
-    gridRef.current.api.deselectAll();
-  }, []);
-
-  const insertButtonListener = useCallback(
-    (e) => {
-      const newRow = {};
-      rowData.unshift(newRow);
-      setRowData(rowData);
-      gridRef.current.api.setRowData(rowData);
-      //gridRef.current.api.applyTransaction({ add: [{}] });
-    },
-    [rowData]
-  );
 
   const onRemoveSelected = useCallback(() => {
     const rows = gridRef.current.api.getSelectedRows();
@@ -116,12 +90,6 @@ const Product = (props) => {
         console.error(e);
       }
     }
-  }, []);
-
-  const onCellValueChanged = useCallback((event) => {
-    console.debug(
-      "onCellValueChanged: " + event.colDef.field + " = " + event.newValue
-    );
   }, []);
 
   const onRowValueChanged = useCallback((event) => {
@@ -154,36 +122,21 @@ const Product = (props) => {
 
   return (
     <div>
-      {/* Example using Grid's API */}
-      <Button
-        variant="outlined"
-        onClick={buttonListener}
-        className={styles.buttonMargins}
-      >
-        Deselect all
-      </Button>
-      <Button
-        variant="outlined"
-        onClick={insertButtonListener}
-        className={styles.buttonMargins}
-      >
-        New row
-      </Button>
-      <Button
-        variant="outlined"
-        onClick={onRemoveSelected}
-        className={styles.buttonMargins}
-      >
-        Remove selected
-      </Button>
-      <Button
-        variant="outlined"
-        onClick={refresh}
-        className={styles.buttonMargins}
-      >
-        Refresh
-      </Button>
-
+      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+        <Button
+          variant="outlined"
+          disabled={accessLevel != 1}
+        >
+          Add Product
+        </Button>
+        <Button
+          variant="outlined"
+          disabled={accessLevel != 1}
+          onClick={onRemoveSelected}
+        >
+          Remove selected
+        </Button>
+      </Stack>
       {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
       {/* <div className="ag-theme-alpine" style={{ width: 500, height: 500 }}> */}
       <div className="ag-theme-alpine" style={{ width: "100%", height: 800 }}>
@@ -194,9 +147,7 @@ const Product = (props) => {
           defaultColDef={defaultColDef} // Default Column Properties
           editType={"fullRow"} // Optional - enables full row editings
           animateRows={true} // Optional - set to 'true' to have rows animate when sorted
-          rowSelection="multiple" // Options - allows click selection of rows
-          //onCellClicked={cellClickedListener} // Optional - registering for Grid Event
-          onCellValueChanged={onCellValueChanged} // Optional - registering for Grid Event
+          rowSelection="single" // Options - allows click selection of rows
           onRowValueChanged={onRowValueChanged} // Optional - registering for Grid Event
         />
       </div>
