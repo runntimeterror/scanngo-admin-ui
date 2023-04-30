@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Stack, TextField, Autocomplete } from "@mui/material";
+import {
+  Stack,
+  TextField,
+  Autocomplete,
+  DialogActions,
+  Button,
+  Typography,
+} from "@mui/material";
 
 export default function AddInventory(props) {
   const [products, setProducts] = React.useState([]);
-  const handleProductSelection = (event, product) => {};
+  const [product, selectProduct] = React.useState({});
+  const handleProductSelection = (event, product) => {
+    selectProduct(product);
+  };
   const fetchProducts = async () => {
     const token = localStorage.getItem("token");
     const headers = new Headers({
@@ -18,44 +28,62 @@ export default function AddInventory(props) {
     setProducts(
       productResp.map((pr) => {
         return {
-          name: `${pr.brandName} ${pr.modelName} ${pr.modelNumber}`,
+          name: `${pr.brandName} ${pr.modelName}`,
           id: pr.productId,
         };
       })
     );
   };
+  const handleAddInventory = (event) => {
+    event.preventDefault();
+    const formElements = event.target.elements;
+    const payload = {
+      productId: product.id,
+      qty: +formElements.qty.value,
+      price: +formElements.price.value,
+    };
+    debugger;
+  };
   useEffect(() => {
     fetchProducts();
   }, []);
   return (
-    <Stack spacing={4}>
-      <Autocomplete
-        disablePortal
-        id="autocomplete-store"
-        options={products.map((product) => {
-          return { label: product.name, id: product.clientId };
-        })}
-        onChange={handleProductSelection}
-        renderInput={(params) => (
-          <TextField {...params} variant="outlined" label="Product" />
-        )}
-      />
-      <TextField
-        id="qty"
-        name="qty"
-        label="Quantity"
-        variant="standard"
-        required
-        type="number"
-      />
-      <TextField
-        id="price"
-        name="price"
-        label="Price"
-        variant="standard"
-        required
-        type="number"
-      />
-    </Stack>
+    <form onSubmit={handleAddInventory}>
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Add Inventory
+      </Typography>
+      <Stack spacing={4} sx={{ width: 280 }}>
+        <Autocomplete
+          disablePortal
+          id="autocomplete-store"
+          options={products.map((product) => {
+            return { label: product.name, id: product.id };
+          })}
+          onChange={handleProductSelection}
+          renderInput={(params) => <TextField {...params} label="Product" />}
+        />
+        <Stack direction="row" spacing={2}>
+          <TextField
+            id="qty"
+            name="qty"
+            label="Quantity"
+            variant="outlined"
+            required
+            type="number"
+          />
+          <TextField
+            id="price"
+            name="price"
+            label="Price"
+            variant="outlined"
+            required
+            type="number"
+          />
+        </Stack>
+      </Stack>
+      <DialogActions sx={{ mt: 2 }}>
+        <Button type="submit">Save</Button>
+      </DialogActions>
+    </form>
   );
 }
