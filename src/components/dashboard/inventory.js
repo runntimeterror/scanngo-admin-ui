@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
+import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
+
 import AddInventory from "./add-inventory";
 import AddBulkInventory from "./add-bulk-inventory";
 
