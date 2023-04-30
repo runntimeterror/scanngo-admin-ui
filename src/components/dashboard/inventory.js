@@ -3,7 +3,6 @@ import React, {
   useRef,
   useEffect,
   useMemo,
-  useCallback,
 } from "react";
 import { isEmpty } from "lodash";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
@@ -95,67 +94,42 @@ const Inventory = (props) => {
 
   useEffect(() => {
     const { accessLevel } = props;
-    if (accessLevel == 1) {
-      fetchClient();
-    } else {
-      fetchInventory();
-    }
+    conditionallyFetchInventory();
   }, []);
 
-  const handleAddComplete = () => {
-    setNewInventoryFormDialog(false);
+  const conditionallyFetchInventory = () => {
     const { accessLevel } = props;
     if (accessLevel == 1) {
       fetchClient();
     } else {
       fetchInventory();
     }
-  }
+  };
 
-  const onRemoveSelected = useCallback(() => {
-    const rows = gridRef.current.api.getSelectedRows();
-    for (let row of rows) {
-      const jsonStr = JSON.stringify(row);
-      console.debug("onRemoveSelected: (" + jsonStr + ")");
-      const requestOptions = {
-        method: "DELETE",
-        headers: headers,
-      };
-      try {
-        fetch("/api/inventory/" + row.inventoryProductId, requestOptions)
-          .then((response) => response.json())
-          .then((data) =>
-            console.log("DELETE response: " + JSON.stringify(data))
-          )
-          .then((data) => gridRef.current.api.applyTransaction({ remove: row }))
-          .catch((error) => console.error(error));
-      } catch (e) {
-        console.error(e);
-      }
+  const handleAddComplete = () => {
+    setNewInventoryFormDialog(false);
+    conditionallyFetchInventory();
+  };
+
+
+  const onCellValueChanged = (event) => {
+    const { qty, price, productId } = event.data;
+    if (!isEmpty(client)) {
+      headers["Client-Id"] = client.id;
     }
-  }, []);
-
-  const onRowValueChanged = useCallback((event) => {
-    var data = event.data;
-    const jsonStr = JSON.stringify(data);
-    console.debug("onRowValueChanged: (" + jsonStr + ")");
     const requestOptions = {
-      method: "PUT",
+      method: "POST",
       headers: headers,
-      body: jsonStr,
+      body: JSON.stringify([{ qty, price, productId }]),
     };
-    fetch("/api/inventory/" + data.inventoryProductId, requestOptions)
+    fetch("/api/inventory", requestOptions)
       .then((response) => response.json())
-      .then((data) => console.log("PUT response: " + JSON.stringify(data)));
-    //.then(data => this.setState({ postId: data.id }));
-  }, []);
+      .then(() => conditionallyFetchInventory());
+  };
 
   return (
     <div>
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-        <Button variant="outlined" onClick={onRemoveSelected}>
-          Remove selected
-        </Button>
         <Button
           variant="outlined"
           disabled={accessLevel == 1 && isEmpty(client)}
@@ -189,7 +163,7 @@ const Inventory = (props) => {
           defaultColDef={defaultColDef} // Default Column Properties
           animateRows={true} // Optional - set to 'true' to have rows animate when sorted
           rowSelection="single" // Options - allows click selection of rows
-          onRowValueChanged={onRowValueChanged} // Optional - registering for Grid Event
+          onCellValueChanged={onCellValueChanged} // Optional - registering for Grid Event
         />
       </div>
       <Dialog
