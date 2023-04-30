@@ -4,13 +4,34 @@ import React, { useState } from "react";
 import { useCSVReader } from "react-papaparse";
 import { isEqual } from "lodash";
 
-export default function AddBulkInventory() {
+export default function AddBulkInventory(props) {
   const { CSVReader } = useCSVReader();
   const [tableHead, setTableHead] = useState([]);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = React.useState(false);
-  const submitData = (event) => {
+
+  const submitData = async (event) => {
     event.preventDefault();
+    const payload = rows.map((row) => {
+      const [productId, productName, qty, price] = row;
+      return { productId: +productId, qty: +qty, price: +price };
+    });
+    const token = localStorage.getItem("token");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    if (props.id) {
+      headers["Client-Id"] = props.id;
+    }
+    const servResp = await fetch(`/api/inventory`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+    if (servResp.status === 200) {
+      props.successCallback();
+    }
   };
 
   const handleClose = (event, reason) => {

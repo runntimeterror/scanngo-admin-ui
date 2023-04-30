@@ -96,7 +96,11 @@ const Inventory = (props) => {
   const conditionallyFetchInventory = () => {
     const { accessLevel } = props;
     if (accessLevel == 1) {
-      fetchClient();
+      if (isEmpty(client)) {
+        fetchClient();
+      } else {
+        fetchInventory(client.id);
+      }
     } else {
       fetchInventory();
     }
@@ -104,6 +108,11 @@ const Inventory = (props) => {
 
   const handleBulkUploadDialogClose = () => {
     setBulkUploadFormDialog(false);
+  };
+
+  const handleBulkUploadComplete = () => {
+    setBulkUploadFormDialog(false);
+    conditionallyFetchInventory();
   };
 
   const handleAddComplete = () => {
@@ -181,7 +190,10 @@ const Inventory = (props) => {
       </Dialog>
       <Dialog onClose={handleBulkUploadDialogClose} open={bulkUploadFormDialog}>
         <Box sx={{ padding: `32px 15px` }}>
-          <AddBulkInventory successCallback={handleAddComplete} {...client} />
+          <AddBulkInventory
+            successCallback={handleBulkUploadComplete}
+            {...client}
+          />
         </Box>
       </Dialog>
     </div>
