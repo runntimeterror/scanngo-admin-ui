@@ -95,22 +95,22 @@ const Inventory = (props) => {
 
   useEffect(() => {
     const { accessLevel } = props;
-    if (accessLevel == 1) {
-      fetchClient();
-    } else {
-      fetchInventory();
-    }
+    conditionallyFetchInventory();
   }, []);
 
-  const handleAddComplete = () => {
-    setNewInventoryFormDialog(false);
+  const conditionallyFetchInventory = () => {
     const { accessLevel } = props;
     if (accessLevel == 1) {
       fetchClient();
     } else {
       fetchInventory();
     }
-  }
+  };
+
+  const handleAddComplete = () => {
+    setNewInventoryFormDialog(false);
+    conditionallyFetchInventory();
+  };
 
   const onRemoveSelected = useCallback(() => {
     const rows = gridRef.current.api.getSelectedRows();
@@ -135,20 +135,20 @@ const Inventory = (props) => {
     }
   }, []);
 
-  const onRowValueChanged = useCallback((event) => {
-    var data = event.data;
-    const jsonStr = JSON.stringify(data);
-    console.debug("onRowValueChanged: (" + jsonStr + ")");
+  const onCellValueChanged = (event) => {
+    const { qty, price, productId } = event.data;
+    if (!isEmpty(client)) {
+      headers["Client-Id"] = client.id;
+    }
     const requestOptions = {
-      method: "PUT",
+      method: "POST",
       headers: headers,
-      body: jsonStr,
+      body: JSON.stringify([{ qty, price, productId }]),
     };
-    fetch("/api/inventory/" + data.inventoryProductId, requestOptions)
+    fetch("/api/inventory", requestOptions)
       .then((response) => response.json())
-      .then((data) => console.log("PUT response: " + JSON.stringify(data)));
-    //.then(data => this.setState({ postId: data.id }));
-  }, []);
+      .then(() => conditionallyFetchInventory());
+  };
 
   return (
     <div>
@@ -189,7 +189,7 @@ const Inventory = (props) => {
           defaultColDef={defaultColDef} // Default Column Properties
           animateRows={true} // Optional - set to 'true' to have rows animate when sorted
           rowSelection="single" // Options - allows click selection of rows
-          onRowValueChanged={onRowValueChanged} // Optional - registering for Grid Event
+          onCellValueChanged={onCellValueChanged} // Optional - registering for Grid Event
         />
       </div>
       <Dialog
