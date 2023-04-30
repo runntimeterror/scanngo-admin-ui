@@ -26,11 +26,11 @@ async function handler(req, res) {
     resp = await fetch(`${API_DOMAIN}/` + endpoint, {
       method: req.method,
       headers: headers,
-      body: request,
+      body: JSON.stringify(request),
     });
   }
   const body = await resp.json();
-  return res.status(200).json(body);
+  return res.status(resp.status).json(body);
 }
 
 export default handler;

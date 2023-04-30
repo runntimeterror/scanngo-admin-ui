@@ -14,8 +14,8 @@ export default function AddInventory(props) {
   const handleProductSelection = (event, product) => {
     selectProduct(product);
   };
+  const token = localStorage.getItem("token");
   const fetchProducts = async () => {
-    const token = localStorage.getItem("token");
     const headers = new Headers({
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -34,14 +34,26 @@ export default function AddInventory(props) {
       })
     );
   };
-  const handleAddInventory = (event) => {
+  const handleAddInventory = async (event) => {
     event.preventDefault();
     const formElements = event.target.elements;
-    const payload = {
+    const payload = [{
       productId: product.id,
       qty: +formElements.qty.value,
       price: +formElements.price.value,
+    }];
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     };
+    if (props.id) {
+      headers["Client-Id"] = props.id;
+    }
+    const servResp = await fetch(`/api/inventory`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
   };
   useEffect(() => {
     fetchProducts();
