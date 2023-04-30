@@ -3,44 +3,28 @@ import React, {
   useRef,
   useEffect,
   useMemo,
-  useCallback,
 } from "react";
-import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import { Button, Stack, Snackbar, Dialog, Box } from "@mui/material";
 import AddProduct from "./add-product";
-
-import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
-import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
+import { DataGrid } from "@mui/x-data-grid";
 
 const Product = (props) => {
   const { accessLevel } = props;
-  const gridRef = useRef(); // Optional - for accessing Grid's API
-  const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
+  const [rowData, setRowData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [firstRender, setFirstRender] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [newProductDialog, setNewProductFormDialog] = React.useState(false);
-  // Each Column Definition results in one Column.
-  const [columnDefs, setColumnDefs] = useState([
-    {
-      field: "productId",
-      filter: true,
-      type: "numericColumn",
-      valueParser: (params) => Number(params.newValue),
-    },
-    { field: "price", valueParser: (params) => Number(params.newValue) },
-    { field: "barcode", filter: true, type: "numericColumn" },
-    { field: "programCategory", filter: true },
-    { field: "productType", filter: true },
-    { field: "brandName", filter: true },
-    { field: "modelName", filter: true },
-    { field: "modelNumber", filter: true },
-  ]);
 
-  // DefaultColDef sets props common to all Columns
-  const defaultColDef = useMemo(() => ({
-    sortable: true,
-    editable: accessLevel == 1,
-  }));
+  const columnDefs = [
+    { field: "brandName", headerName: "Brand", filter: true, width: 170 },
+    { field: "modelName", headerName: "Model", filter: true, width: 180 },
+    { field: "modelNumber", headerName: "Model Number", filter: true, width: 130 },
+    { field: "price", headerName: "Price", valueParser: (params) => Number(params.newValue) },
+    { field: "barcode", headerName: "Barcode", filter: true, type: "numericColumn" },
+    { field: "programCategory", headerName: "Category", filter: true },
+    { field: "productType", headerName: "Type", filter: true },
+  ]
 
   const token = localStorage.getItem("token");
   const headers = new Headers({
@@ -68,13 +52,14 @@ const Product = (props) => {
   }, [firstRender]);
 
   const downloadCsv = () => {
-    const rows = gridRef.current.api.getSelectedRows();
+    const rows = selectedRows;
     if (rows.length === 0) return;
     const data = [];
     for (const row of rows) {
+      const product = rowData.find((prod) => prod.productId === row);
       data.push({
-        productId: row.productId,
-        productName: `${row.brandName} ${row.modelName}`,
+        productId: row,
+        productName: `${product.brandName} ${product.modelName}`,
         qty: 0,
         price: 0,
       });
@@ -109,55 +94,26 @@ const Product = (props) => {
     setOpen(false);
   };
 
-  const onRemoveSelected = useCallback(() => {
-    const rows = gridRef.current.api.getSelectedRows();
+  const removeSelected = () => {
+    const rows = selectedRows;
     for (let row of rows) {
-      const jsonStr = JSON.stringify(row);
-      console.debug("onRemoveSelected: (" + jsonStr + ")");
       const requestOptions = {
         method: "DELETE",
         headers: headers,
       };
       try {
-        fetch(host + "/product/" + row.productId, requestOptions)
+        fetch(host + "/product/" + row, requestOptions)
           .then((response) => response.json())
-          .then((data) =>
-            console.log("DELETE response: " + JSON.stringify(data))
-          )
           .catch((error) => console.error(error));
       } catch (e) {
         console.error(e);
       }
     }
-  }, []);
+  };
 
-  const onRowValueChanged = useCallback((event) => {
-    var data = event.data;
-    if (data.productId) {
-      const jsonStr = JSON.stringify([data]);
-      const requestOptions = {
-        method: "PUT",
-        headers: headers,
-        body: jsonStr,
-      };
-      fetch(host + "/product", requestOptions)
-        .then((response) => response.json())
-        .then((data) => console.log("PUT response: " + JSON.stringify(data)));
-    } else {
-      delete data.productId;
-      const jsonStr = JSON.stringify([data]);
-      const requestOptions = {
-        method: "POST",
-        headers: headers,
-        body: jsonStr,
-      };
-      fetch(host + "/product", requestOptions)
-        .then((response) => response.json())
-        .then((data) => console.log("POST response: " + JSON.stringify(data)))
-        .then((data) => gridRef.current.api.applyTransaction({ update: data }))
-        .catch((error) => console.error(error));
-    }
-  }, []);
+  const getRowId = (product) => {
+    return product.productId;
+  };
 
   const handleAddProductDialogClose = () => {
     setNewProductFormDialog(false);
@@ -166,6 +122,10 @@ const Product = (props) => {
   const handleAddComplete = () => {
     loadData();
     setNewProductFormDialog(false);
+  };
+
+  const onRowSelect = (rowIds) => {
+    setSelectedRows(rowIds);
   };
 
   return (
@@ -183,7 +143,7 @@ const Product = (props) => {
         <Button
           variant="outlined"
           disabled={accessLevel != 1}
-          onClick={onRemoveSelected}
+          onClick={() => {removeSelected()}}
         >
           Remove selected
         </Button>
@@ -198,16 +158,16 @@ const Product = (props) => {
         />
       </Stack>
       <div className="ag-theme-alpine" style={{ width: "100%", height: 800 }}>
-        <AgGridReact
-          ref={gridRef} // Ref for accessing Grid's API
-          rowData={rowData} // Row Data for Rows
-          columnDefs={columnDefs} // Column Defs for Columns
-          defaultColDef={defaultColDef} // Default Column Properties
-          editType={"fullRow"} // Optional - enables full row editings
-          animateRows={true} // Optional - set to 'true' to have rows animate when sorted
-          rowSelection="multiple" // Options - allows click selection of rows
-          onRowValueChanged={onRowValueChanged} // Optional - registering for Grid Event
-        />
+        {rowData.length > 0 && (
+          <DataGrid
+            rows={rowData}
+            columns={columnDefs}
+            getRowId={getRowId}
+            pagination
+            checkboxSelection
+            onRowSelectionModelChange={onRowSelect}
+          />
+        )}
       </div>
       <Dialog onClose={handleAddProductDialogClose} open={newProductDialog}>
         <Box sx={{ padding: `32px 15px` }}>
