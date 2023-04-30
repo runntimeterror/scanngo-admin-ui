@@ -20,7 +20,6 @@ async function handler(req, res) {
     method: req.method,
     headers: headers,
   });
-  debugger
   const body = await resp.json();
   return res.status(resp.status).json(body);
 }
