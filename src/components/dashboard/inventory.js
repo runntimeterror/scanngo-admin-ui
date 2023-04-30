@@ -29,39 +29,30 @@ const Inventory = (props) => {
 
   // Each Column Definition results in one Column.
   const [columnDefs, setColumnDefs] = useState([
+    { field: "brandName", filter: true },
+    { field: "modelName", filter: true },
+    { field: "modelNumber", filter: true },
     {
-      field: "productId",
-      filter: true,
-      type: "numericColumn",
+      field: "price",
       valueParser: (params) => Number(params.newValue),
+      editable: true,
     },
-    {
-      field: "inventoryProductId",
-      filter: true,
-      type: "numericColumn",
-      valueParser: (params) => Number(params.newValue),
-    },
-    { field: "name", filter: true },
-    { field: "imageUrl", filter: true },
-    { field: "price", valueParser: (params) => Number(params.newValue) },
     {
       field: "qty",
       filter: true,
       type: "numericColumn",
+      editable: true,
       valueParser: (params) => Number(params.newValue),
     },
-    { field: "barcode", filter: true, type: "numericColumn" },
+    { field: "barcode", filter: true, type: "numericColumn", editable: true },
     { field: "programCategory", filter: true },
     { field: "productType", filter: true },
-    { field: "brandName", filter: true },
-    { field: "modelName", filter: true },
-    { field: "modelNumber", filter: true },
   ]);
 
   // DefaultColDef sets props common to all Columns
   const defaultColDef = useMemo(() => ({
     sortable: true,
-    editable: true,
+    editable: false,
   }));
 
   const token = localStorage.getItem("token");
@@ -169,9 +160,8 @@ const Inventory = (props) => {
           rowData={rowData} // Row Data for Rows
           columnDefs={columnDefs} // Column Defs for Columns
           defaultColDef={defaultColDef} // Default Column Properties
-          editType={"fullRow"} // Optional - enables full row editings
           animateRows={true} // Optional - set to 'true' to have rows animate when sorted
-          rowSelection="multiple" // Options - allows click selection of rows
+          rowSelection="single" // Options - allows click selection of rows
           onRowValueChanged={onRowValueChanged} // Optional - registering for Grid Event
         />
       </div>
