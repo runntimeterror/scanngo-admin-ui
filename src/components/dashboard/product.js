@@ -6,7 +6,8 @@ import React, {
   useCallback,
 } from "react";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
-import { Button, Stack, Snackbar } from "@mui/material";
+import { Button, Stack, Snackbar, Dialog, Box } from "@mui/material";
+import AddProduct from "./add-product";
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
@@ -17,7 +18,7 @@ const Product = (props) => {
   const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
   const [firstRender, setFirstRender] = useState(false);
   const [open, setOpen] = React.useState(false);
-  
+  const [newProductDialog, setNewProductFormDialog] = React.useState(false);
   // Each Column Definition results in one Column.
   const [columnDefs, setColumnDefs] = useState([
     {
@@ -102,7 +103,7 @@ const Product = (props) => {
   };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpen(false);
@@ -158,10 +159,25 @@ const Product = (props) => {
     }
   }, []);
 
+  const handleAddProductDialogClose = () => {
+    setNewProductFormDialog(false);
+  };
+
+  const handleAddComplete = () => {
+    loadData();
+    setNewProductFormDialog(false);
+  };
+
   return (
     <div>
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-        <Button variant="outlined" disabled={accessLevel != 1}>
+        <Button
+          onClick={() => {
+            setNewProductFormDialog(true);
+          }}
+          variant="outlined"
+          disabled={accessLevel != 1}
+        >
           Add Product
         </Button>
         <Button
@@ -181,8 +197,6 @@ const Product = (props) => {
           message="Edit this CSV (Price, Quantity) and re-upload as Inventory"
         />
       </Stack>
-      {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
-      {/* <div className="ag-theme-alpine" style={{ width: 500, height: 500 }}> */}
       <div className="ag-theme-alpine" style={{ width: "100%", height: 800 }}>
         <AgGridReact
           ref={gridRef} // Ref for accessing Grid's API
@@ -195,6 +209,11 @@ const Product = (props) => {
           onRowValueChanged={onRowValueChanged} // Optional - registering for Grid Event
         />
       </div>
+      <Dialog onClose={handleAddProductDialogClose} open={newProductDialog}>
+        <Box sx={{ padding: `32px 15px` }}>
+          <AddProduct successCallback={handleAddComplete} />
+        </Box>
+      </Dialog>
     </div>
   );
 };
