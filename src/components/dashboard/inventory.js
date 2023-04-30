@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
+import { isEmpty } from "lodash";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import {
   Button,
@@ -25,6 +26,7 @@ const Inventory = (props) => {
   const [newInventoryFormDialog, setNewInventoryFormDialog] =
     React.useState(false);
   const [clients, setClients] = React.useState([]);
+  const [client, selectClient] = React.useState({});
   const fetchClient = async () => {
     const resp = await fetch(`/api/client`, {
       method: "GET",
@@ -70,6 +72,7 @@ const Inventory = (props) => {
   const token = localStorage.getItem("token");
 
   const handleClientIDSelection = (event, client) => {
+    selectClient(client);
     fetchInventory(client.id);
   };
 
@@ -98,6 +101,16 @@ const Inventory = (props) => {
       fetchInventory();
     }
   }, []);
+
+  const handleAddComplete = () => {
+    setNewInventoryFormDialog(false);
+    const { accessLevel } = props;
+    if (accessLevel == 1) {
+      fetchClient();
+    } else {
+      fetchInventory();
+    }
+  }
 
   const onRemoveSelected = useCallback(() => {
     const rows = gridRef.current.api.getSelectedRows();
@@ -145,6 +158,7 @@ const Inventory = (props) => {
         </Button>
         <Button
           variant="outlined"
+          disabled={accessLevel == 1 && isEmpty(client)}
           onClick={() => setNewInventoryFormDialog(true)}
         >
           Add Inventory
@@ -160,11 +174,7 @@ const Inventory = (props) => {
             })}
             onChange={handleClientIDSelection}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                label="Store"
-              />
+              <TextField {...params} variant="outlined" label="Store" />
             )}
           />
         ) : null}
@@ -187,7 +197,7 @@ const Inventory = (props) => {
         open={newInventoryFormDialog}
       >
         <Box sx={{ padding: `32px 15px` }}>
-          <AddInventory />
+          <AddInventory successCallback={handleAddComplete} {...client} />
         </Box>
       </Dialog>
     </div>

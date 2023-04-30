@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react'; // the AG Grid React Component
 import { Button } from "@mui/material";
-import { API_DOMAIN } from "../../../utils";
-import { getCookie } from "cookies-next";
 import styles from '../../styles/Home.module.css'
 
 import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
