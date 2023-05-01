@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Stack, Snackbar, Dialog, Box } from "@mui/material";
 import AddProduct from "./add-product";
 import { DataGrid } from "@mui/x-data-grid";
@@ -19,12 +14,26 @@ const Product = (props) => {
   const columnDefs = [
     { field: "brandName", headerName: "Brand", filter: true, width: 170 },
     { field: "modelName", headerName: "Model", filter: true, width: 180 },
-    { field: "modelNumber", headerName: "Model Number", filter: true, width: 130 },
-    { field: "price", headerName: "Price", valueParser: (params) => Number(params.newValue) },
-    { field: "barcode", headerName: "Barcode", filter: true, type: "numericColumn" },
+    {
+      field: "modelNumber",
+      headerName: "Model Number",
+      filter: true,
+      width: 130,
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      valueParser: (params) => Number(params.newValue),
+    },
+    {
+      field: "barcode",
+      headerName: "Barcode",
+      filter: true,
+      type: "numericColumn",
+    },
     { field: "programCategory", headerName: "Category", filter: true },
     { field: "productType", headerName: "Type", filter: true },
-  ]
+  ];
 
   const token = localStorage.getItem("token");
   const headers = new Headers({
@@ -143,7 +152,9 @@ const Product = (props) => {
         <Button
           variant="outlined"
           disabled={accessLevel != 1}
-          onClick={() => {removeSelected()}}
+          onClick={() => {
+            removeSelected();
+          }}
         >
           Remove selected
         </Button>

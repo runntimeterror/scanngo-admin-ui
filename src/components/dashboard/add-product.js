@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Stack,
   TextField,
@@ -10,10 +10,14 @@ import {
   IconButton,
   FormControl,
   InputLabel,
+  Container,
 } from "@mui/material";
+import Html5QrcodePlugin from "../scanner/Html5QrcodePlugin";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
 
 export default function AddProduct(props) {
+  const [scannerVisible, setScannerVisibility] = React.useState(false);
+  const [barcode, setBarcode] = React.useState();
   const saveProduct = async (event) => {
     event.preventDefault();
 
@@ -50,15 +54,37 @@ export default function AddProduct(props) {
       },
       body: JSON.stringify(payload),
     });
-    if(resp.status === 200) {
-        props.successCallback()
+    if (resp.status === 200) {
+      props.successCallback();
     }
   };
+  const convertEanToUpc = (ean) => {
+    // Remove leading zero if present
+    if (ean.charAt(0) === "0") {
+      ean = ean.substr(1);
+    }
+    return ean;
+  };
+  const onNewBarcodeScanResult = (decodedText) => {
+    setBarcode(convertEanToUpc(decodedText));
+    setScannerVisibility(false);
+  };
+
   return (
     <form onSubmit={saveProduct}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         Add Product
       </Typography>
+      {scannerVisible && (
+        <Container sx={{ paddingTop: 5, paddingBottom: 5 }} maxWidth="sm">
+          <Html5QrcodePlugin
+            fps={10}
+            aspectRatio={2.5}
+            disableFlip={true}
+            qrCodeSuccessCallback={onNewBarcodeScanResult}
+          />
+        </Container>
+      )}
       <Stack spacing={4} sx={{ width: 280 }}>
         <TextField
           id="name"
@@ -73,9 +99,19 @@ export default function AddProduct(props) {
             id="barcode"
             name="barcode"
             label="Barcode"
+            value={barcode ? barcode : ""}
+            onChange={(event) => {
+              setBarcode(event.target.value);
+            }}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton aria-label="toggle barcode reader" edge="end">
+                <IconButton
+                  onClick={() => {
+                    setScannerVisibility(true);
+                  }}
+                  aria-label="toggle barcode reader"
+                  edge="end"
+                >
                   <QrCodeScannerIcon />
                 </IconButton>
               </InputAdornment>
